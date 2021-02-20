@@ -6,12 +6,13 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Archive - 我在开了灯的床头下，想问问自己的心啊</title>
+  <title>Python-生成身份证后6位字典 - 我在开了灯的床头下，想问问自己的心啊</title>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="google" content="notranslate" />
   
-  <meta name="description" content="ture">
+  <meta name="description" content="生成身份证后6位字典首先需要了解一下身份证号码结构：
+...">
   <meta name="author" content="John Doe">
   <link rel="icon" href="/images/icons/favicon-16x16.png" type="image/png" sizes="16x16">
   <link rel="icon" href="/images/icons/favicon-32x32.png" type="image/png" sizes="32x32">
@@ -135,7 +136,7 @@
         <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
       
     </div>
-    <div class="center">归档</div>
+    <div class="center">Python-生成身份证后6位字典</div>
     <div class="right">
       <i class="iconfont iconmenu j-navbar-menu"></i>
     </div>
@@ -156,7 +157,7 @@
       </li><li class="menu-item">
         <a href="/galleries/ " class="underline "> 摄影</a>
       </li><li class="menu-item">
-        <a href="/archives/ " class="underline active"> 归档</a>
+        <a href="/archives/ " class="underline "> 归档</a>
       </li><li class="menu-item">
         <a href="/tags/ " class="underline "> 标签</a>
       </li><li class="menu-item">
@@ -170,71 +171,83 @@
   </div>
 </nav>
   <main id="main">
-  <section class="archive">
-    <div class="archive-container">
-      <div class="archive-post">
-        <h3 class="archive-total">归档: 9 篇</h3>
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img   class="lazyload" data-original="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=4233772603,2493444113&fm=26&gp=0.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">Python-生成身份证后6位字典</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>February 21, 2021</span>
+      
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>1022</span>
+    </div>
+  </div>
+</section>
+    <section class="main">
+      <section class="content">
+        <h4 id="生成身份证后6位字典"><a href="#生成身份证后6位字典" class="headerlink" title="生成身份证后6位字典"></a>生成身份证后6位字典</h4><p>首先需要了解一下身份证号码结构：</p>
+<ul>
+<li><code>1~6</code>，地址码，常住户口所在地的<a target="_blank" rel="noopener" href="https://xingzhengquhua.51240.com/">行政区划代码</a></li>
+<li><code>7~14</code>，出生年月日</li>
+<li><code>15~17</code>，顺序码，且第17位由性别决定。男性为奇数，女性为偶数</li>
+<li><code>18</code>校验码，将前面17位代入公式计算，结果为<code>0~10</code>，若为<code>10</code>则用<code>X</code>表示</li>
+</ul>
+<p>举例：<code>440106 19990101 0010</code></p>
+<ul>
+<li><code>44</code>广东省，<code>01</code>广州市，<code>06</code>天河区</li>
+<li><code>19990101</code>，出生年月日</li>
+<li><code>001</code>，第<code>17</code>位为<code>1</code>即男性</li>
+<li><code>0</code>，最后一位为校验码</li>
+</ul>
+<p>如果需要爆破后6位，即身份证的第<code>13~18</code>位，那么就有<code>10*10*10*10*10*11</code>(最后一位有<code>0~X</code>共11位)种可能</p>
+<ul>
+<li>后6位中的第1位，即出生日期的十位，只能为<code>0~3</code>，即<code>4*10*10*10*10*11</code></li>
+<li>而如果是针对某人而写的字典，知道目标的性别，那么第<code>5</code>位就可以减掉一半。男性为<code>1/3/5/7/9</code>，女性为<code>0/2/4/6/8</code>，即<code>4*10*10*10*5*11</code></li>
+<li>同时，如果知道目标的出生日期（学校发的很多信息表中都会包含出生年月日等信息），即第<code>1~2</code>位也可以确定了。那么需要爆破的只有<code>15~18</code>位，即<code>10*10*5*11=5500</code>，这个数量级已经对于电脑来说很轻松就可以完成。</li>
+</ul>
+<p>说了这么一大堆，其实最后也就10多行代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> itertools<br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:<br>    date = <span class="hljs-built_in">input</span>(<span class="hljs-string">&quot;出生日期: &quot;</span>)<br>    sex = <span class="hljs-string">&#x27;02468&#x27;</span> <span class="hljs-keyword">if</span> <span class="hljs-built_in">int</span>(<span class="hljs-built_in">input</span>(<span class="hljs-string">&quot;性别(男1女2): &quot;</span>)) % <span class="hljs-number">2</span> == <span class="hljs-number">0</span> <span class="hljs-keyword">else</span> <span class="hljs-string">&#x27;13579&#x27;</span>  <span class="hljs-comment"># 性别位</span><br>    check = <span class="hljs-string">&#x27;0123456789X&#x27;</span>  <span class="hljs-comment"># 校验位</span><br>    other = <span class="hljs-string">&#x27;0123456789&#x27;</span>   <span class="hljs-comment"># 其它位</span><br>    nums = itertools.product(other, other, sex, check)<br>    cards = []<br>    <span class="hljs-keyword">for</span> num <span class="hljs-keyword">in</span> nums:<br>        card = date + <span class="hljs-string">&quot;&quot;</span>.join(num)<br>        cards.append(card)<br>    print(<span class="hljs-built_in">len</span>(cards))<br>    print(cards)<br></code></pre></td></tr></table></figure>
+<p><img   class="lazyload" data-original="https://cdn.naraku.cn/imgs/Python_id-cards1.jpg?x-oss-process=image/watermark,type_d3F5LW1pY3JvaGVp,size_14,text_TmFyYWt1,color_FFFFFF,shadow_50,t_80,g_se,x_10,y_10" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  alt="image"></p>
+
+      </section>
+      <section class="extra">
         
         
-          
-            <h3 class="archive-year">2021 年</h3>
-          
-          <div class="archive-item">
-            <a class="archive-date" href="/2021/02/21/Js-%E6%8E%A5%E5%8F%A3%E6%B3%84%E9%9C%B2%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/">February 21</a>
-            <a class="archive-title" href="/2021/02/21/Js-%E6%8E%A5%E5%8F%A3%E6%B3%84%E9%9C%B2%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/">Js-接口泄露漏洞挖掘</a>
-          </div>
+        
+        
+  <nav class="nav">
+    <a href="/2021/02/21/windows%E6%8F%90%E6%9D%83/"><i class="iconfont iconleft"></i>windows提权</a>
+    <a href="/2021/02/21/%E5%9F%9F%E6%B8%97%E9%80%8F-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86/">域渗透-信息收集<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+</section>
+      
+    </section>
+  </div>
+</article></div>
+      <div class="col-xl-3">
         
           
-          <div class="archive-item">
-            <a class="archive-date" href="/2021/02/21/%E7%BA%A2%E8%93%9D%E5%AF%B9%E6%8A%97%E4%B9%8BWindows%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/">February 21</a>
-            <a class="archive-title" href="/2021/02/21/%E7%BA%A2%E8%93%9D%E5%AF%B9%E6%8A%97%E4%B9%8BWindows%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/">红蓝对抗之Windows内网渗透</a>
-          </div>
-        
-          
-          <div class="archive-item">
-            <a class="archive-date" href="/2021/02/21/windows%E6%8F%90%E6%9D%83/">February 21</a>
-            <a class="archive-title" href="/2021/02/21/windows%E6%8F%90%E6%9D%83/">windows提权</a>
-          </div>
-        
-          
-          <div class="archive-item">
-            <a class="archive-date" href="/2021/02/21/%E8%BA%AB%E4%BB%BD%E8%AF%81%E5%90%8E6%E4%BD%8D%E5%AD%97%E5%85%B8/">February 21</a>
-            <a class="archive-title" href="/2021/02/21/%E8%BA%AB%E4%BB%BD%E8%AF%81%E5%90%8E6%E4%BD%8D%E5%AD%97%E5%85%B8/">Python-生成身份证后6位字典</a>
-          </div>
-        
-          
-          <div class="archive-item">
-            <a class="archive-date" href="/2021/02/21/%E5%9F%9F%E6%B8%97%E9%80%8F-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86/">February 21</a>
-            <a class="archive-title" href="/2021/02/21/%E5%9F%9F%E6%B8%97%E9%80%8F-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86/">域渗透-信息收集</a>
-          </div>
-        
-          
-          <div class="archive-item">
-            <a class="archive-date" href="/2021/02/21/xss%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98%E6%8A%80%E5%B7%A7/">February 21</a>
-            <a class="archive-title" href="/2021/02/21/xss%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98%E6%8A%80%E5%B7%A7/">XSS漏洞挖掘-进阶</a>
-          </div>
-        
-          
-          <div class="archive-item">
-            <a class="archive-date" href="/2021/02/20/SSRF%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E4%B8%8E%E6%8C%96%E6%8E%98/">February 20</a>
-            <a class="archive-title" href="/2021/02/20/SSRF%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E4%B8%8E%E6%8C%96%E6%8E%98/">SSRF漏洞利用与挖掘</a>
-          </div>
-        
-          
-          <div class="archive-item">
-            <a class="archive-date" href="/2021/02/20/%E5%88%A9%E7%94%A8python%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96bypass360/">February 20</a>
-            <a class="archive-title" href="/2021/02/20/%E5%88%A9%E7%94%A8python%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96bypass360/">利用python反序列化bypass360</a>
-          </div>
-        
-          
-          <div class="archive-item">
-            <a class="archive-date" href="/2021/02/20/mysql%E6%B3%A8%E5%85%A5%E7%AC%94%E8%AE%B0/">February 20</a>
-            <a class="archive-title" href="/2021/02/20/mysql%E6%B3%A8%E5%85%A5%E7%AC%94%E8%AE%B0/">MySQL注入笔记</a>
-          </div>
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    
+  </aside>
+
         
       </div>
     </div>
-  </section>
+  </div>
 </main>
   
 

