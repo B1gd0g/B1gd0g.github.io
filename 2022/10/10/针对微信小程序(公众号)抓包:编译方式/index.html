@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+    
+    <title>针对微信小程序(公众号)抓包/反编译方式 - B1gd0g</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+    
+    <link rel="shortcut icon" href="https://spring.io/images/favicon-9d25009f65637a49ac8d91eb1cf7b75e.ico" type="image/x-icon" />
+    <meta name="description" content="简单总结日常个人针对小程序&#x2F;微信公众号进行渗透测试的一些抓包以及编译手法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="针对微信小程序(公众号)抓包&#x2F;反编译方式">
+<meta property="og:url" content="https://b1gd0g.github.io/2022/10/10/%E9%92%88%E5%AF%B9%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F(%E5%85%AC%E4%BC%97%E5%8F%B7)%E6%8A%93%E5%8C%85:%E7%BC%96%E8%AF%91%E6%96%B9%E5%BC%8F/index.html">
+<meta property="og:site_name" content="B1gd0g">
+<meta property="og:description" content="简单总结日常个人针对小程序&#x2F;微信公众号进行渗透测试的一些抓包以及编译手法。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111056825.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111056848.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111056898.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111058110.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111059333.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111104140.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111104329.png">
+<meta property="article:published_time" content="2022-10-09T17:00:06.000Z">
+<meta property="article:modified_time" content="2022-10-11T07:27:33.588Z">
+<meta property="article:author" content="B1gd0g">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111056825.png">
+    
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+    <link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1665474214408">
+    
+    <link rel="stylesheet" href="/css/style.css?v=1665474214408">
+
+    
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="mdui-drawer-body-left">
+    <div id="nexmoe-background">
+        <div class="nexmoe-bg" style="background-image: url(https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111542873.png)"></div>
+        <div class="mdui-appbar mdui-shadow-0">
+            <div class="mdui-toolbar">
+                <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon mdui-ripple"><i class="mdui-icon nexmoefont icon-menu"></i></a>
+                <div class="mdui-toolbar-spacer"></div>
+                <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+                <a href="/" title="B1gd0g" class="mdui-btn mdui-btn-icon"><img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g"></a>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-header">
+        <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="B1gd0g">
+            <img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g" alt="B1gd0g">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>15</div>
+        <div><span>标签</span>12</div>
+        <div><span>分类</span>2</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E6%9D%80%E8%BD%AF%E5%AF%B9%E6%AF%94.html" title="杀软对比">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                杀软对比
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E7%A4%BE%E5%B7%A5%E5%AF%86%E7%A0%81.html" title="社工密码">
+            <i class="mdui-list-item-icon nexmoefont icon-coffee"></i>
+            <div class="mdui-list-item-content">
+                社工密码
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E5%AF%BC%E8%88%AA.html" title="我的导航">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                我的导航
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/about.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    <aside id="nexmoe-sidebar">
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="搜索"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <!-- 一言 -->
+<div class="nexmoe-widget-wrap">
+  <h3 class="nexmoe-widget-title">
+    一言
+  </h3>
+  <div class="nexmoe-widget">
+    <ul class="hitokoto-box">
+      <li id="hitokoto_text_parent" class="hitokoto-text" hitokotoCategory="">
+        <a href="#" id="hitokoto_text">
+          
+        </a>
+        <a href="#" id="hitokoto_error_text" style="display: none;">
+          
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  let hitokotoText = document.getElementById('hitokoto_text')
+  let hitokotoErroText = document.getElementById('hitokoto_error_text')
+  let hitokotoCategory = document.getElementById('hitokoto_text_parent').getAttribute('hitokotoCategory')
+  window.onload = function () {
+    let url = 'https://v1.hitokoto.cn'
+    if (hitokotoCategory) {
+      url += '?c=' + hitokotoCategory
+    }
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        hitokotoText.innerText = "「 " + data.hitokoto + " 」 from " + data.from
+        hitokotoText.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      })
+      .catch((reason) => {
+        console.error(11, reason)
+        hitokotoText.style.display = 'none'
+        hitokotoErroText.style.display = 'block'
+      })
+  }
+</script>
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章分类</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/tools/">tools</a>
+          <span class="category-list-count">4</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/安全小记/">安全小记</a>
+          <span class="category-list-count">10</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/Html/" style="font-size: 10px;">Html</a> <a href="/tags/JavaScript/" style="font-size: 10px;">JavaScript</a> <a href="/tags/PHP/" style="font-size: 10px;">PHP</a> <a href="/tags/cmd/" style="font-size: 10px;">cmd</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" style="font-size: 10px;">代码审计</a> <a href="/tags/%E5%85%8D%E6%9D%80/" style="font-size: 10px;">免杀</a> <a href="/tags/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/" style="font-size: 10px;">内网渗透</a> <a href="/tags/%E6%8F%90%E6%9D%83/" style="font-size: 10px;">提权</a> <a href="/tags/%E7%BA%A2%E8%93%9D%E5%AF%B9%E6%8A%97/" style="font-size: 10px;">红蓝对抗</a> <a href="/tags/%E9%92%93%E9%B1%BC/" style="font-size: 10px;">钓鱼</a>
+    </div>
+    
+  </div>
+
+    
+        
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2022 B1gd0g
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        
+    </div>
+</div><!-- .nexmoe-drawer -->
+    </div>
+    <div id="nexmoe-content">
+        <div class="nexmoe-primary">
+            <div class="nexmoe-post">
+
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 37.5%;"> 
+            <img src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111109881.png" alt="针对微信小程序(公众号)抓包/反编译方式" loading="lazy">
+            <h1>针对微信小程序(公众号)抓包/反编译方式</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2022年10月10日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/%E5%AE%89%E5%85%A8%E5%B0%8F%E8%AE%B0/">安全小记</a>
+        
+        
+    <a><i class="nexmoefont icon-areachart"></i>约694字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>预计需要2分钟</a>
+
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <p>简单总结日常个人针对小程序/微信公众号进行渗透测试的一些抓包以及编译手法。</p>
+<a id="more"></a>
+
+<h2 id="抓包"><a href="#抓包" class="headerlink" title="抓包"></a>抓包</h2><h3 id="微信User-Agent"><a href="#微信User-Agent" class="headerlink" title="微信User-Agent"></a>微信User-Agent</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.23(0x1800172f) NetType/WIFI Language/zh_CN<br></code></pre></td></tr></table></figure>
+<h3 id="mac下抓取微信小程序数据包"><a href="#mac下抓取微信小程序数据包" class="headerlink" title="mac下抓取微信小程序数据包"></a>mac下抓取微信小程序数据包</h3><p>mac本机安装burp证书—&gt;设置本机http/https代理一致—&gt;设置微信代理为一致—&gt;微信访问小程序即可成功抓包。</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111056825.png" alt="img" data-caption="img" loading="lazy"></p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111056848.png" alt="img" data-caption="img" loading="lazy"></p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111056898.png" alt="img" data-caption="img" loading="lazy"></p>
+<h3 id="iphone手机抓取微信公众号数据包"><a href="#iphone手机抓取微信公众号数据包" class="headerlink" title="iphone手机抓取微信公众号数据包"></a>iphone手机抓取微信公众号数据包</h3><p>mac下burp设置代理—&gt;iphone已安装bp证书—&gt;iphone与mac同一网络下，手动设置代理—&gt;访问公众号链接即可实现抓取微信公众号数据包。</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111058110.png" alt="img" data-caption="img" loading="lazy"></p>
+<h3 id="yakit抓取微信公众号和小程序"><a href="#yakit抓取微信公众号和小程序" class="headerlink" title="yakit抓取微信公众号和小程序"></a>yakit抓取微信公众号和小程序</h3><p>（抓包时尽量不用proxifer全局代理，可启用爱加速作为socks5上层代理）配置启用系统代理后，直接访问微信，或公众号或者其他app程序都可直接抓取数据包</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111059333.png" alt="img" data-caption="img" loading="lazy"></p>
+<h2 id="小程序反编译"><a href="#小程序反编译" class="headerlink" title="小程序反编译"></a>小程序反编译</h2><h3 id="获取小程序wxapkg包"><a href="#获取小程序wxapkg包" class="headerlink" title="获取小程序wxapkg包"></a>获取小程序wxapkg包</h3><ul>
+<li>使用windows微信电脑端，路径位于</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">C:\Users\用户名\Documents\WeChat Files\Applet\小程序ID\序号\__APP__.wxapkg<br></code></pre></td></tr></table></figure>
+<ul>
+<li>使用模拟器获取，模拟器root过后，利用模拟器登陆微信，访问小程序，前往路径下获取</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">/data/data/com.tencent.mm/MicroMsg/&#123;用户ID&#125;/appbrand/pkg/<br></code></pre></td></tr></table></figure>
+<ul>
+<li>使用安卓手机获取，手机需要通过root，登陆微信，访问小程序，前往路径下获取 </li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">/data/data/com.tencent.mm/MicroMsg/&#123;用户ID&#125;/appbrand/pkg/<br></code></pre></td></tr></table></figure>
+<h3 id="解密wxapkg包"><a href="#解密wxapkg包" class="headerlink" title="解密wxapkg包"></a>解密wxapkg包</h3><p>获取到包以后，需要解包。<br>如果是电脑端获取的，需要先进行pc解密，然后再解包。</p>
+<p>如果是模拟器或手机端获取，可以直接进行解包。</p>
+<h4 id="PC解密"><a href="#PC解密" class="headerlink" title="PC解密"></a>PC解密</h4><p><a target="_blank" rel="noopener" href="https://github.com/renblog/pc_wxapkg_decrypt_python">https://github.com/renblog/pc_wxapkg_decrypt_python</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">python main.py --wxid 微信APPID --file 输入文件 --output 输出文件<br>python main.py --wxid wx1234567890123456 --file __APP__.wxapkg --output dec.wxapkg<br></code></pre></td></tr></table></figure>
+<h3 id="模拟器中把wxapkg文件导出"><a href="#模拟器中把wxapkg文件导出" class="headerlink" title="模拟器中把wxapkg文件导出"></a>模拟器中把wxapkg文件导出</h3><p>利用adb （mac可以使用brew install android-platform-tools安装adb）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">adb shell	<span class="hljs-comment">#开启虚拟机后自动连接</span><br></code></pre></td></tr></table></figure>
+<p>参考目录：把虚拟机里wxapkg文件下载到本机Downloads目录下</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">adb</span> pull /data/data/com.tencent.mm/MicroMsg/<span class="hljs-number">9</span>e<span class="hljs-number">42</span>f<span class="hljs-number">474</span>e<span class="hljs-number">40</span>f<span class="hljs-number">0</span>ac<span class="hljs-number">586</span>c<span class="hljs-number">2</span>deb<span class="hljs-number">9313</span>def<span class="hljs-number">5</span>d/appbrand/pkg/_<span class="hljs-number">910726406</span>_<span class="hljs-number">11</span>.wxapkg ~/Downloads/_<span class="hljs-number">910726406</span>_<span class="hljs-number">11</span>.wxapkg<br></code></pre></td></tr></table></figure>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111104140.png" alt="img" data-caption="img" loading="lazy"></p>
+<h3 id="反编译获取源码工具（CrackMinApp-zip）"><a href="#反编译获取源码工具（CrackMinApp-zip）" class="headerlink" title="反编译获取源码工具（CrackMinApp.zip）"></a>反编译获取源码工具（CrackMinApp.zip）</h3><p><a target="_blank" rel="noopener" href="https://github.com/Cherrison/CrackMinApp">https://github.com/Cherrison/CrackMinApp</a></p>
+<p>把wxapkg包丢到wxapkg目录中运行exe即可直接进行源码获取</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111104329.png" alt="img" data-caption="img" loading="lazy"></p>
+<h3 id="反编译获取源码工具（wxappUnpacker1）"><a href="#反编译获取源码工具（wxappUnpacker1）" class="headerlink" title="反编译获取源码工具（wxappUnpacker1）"></a>反编译获取源码工具（wxappUnpacker1）</h3><p><a target="_blank" rel="noopener" href="https://github.com/jas502n/wxappUnpacker1">https://github.com/jas502n/wxappUnpacker1</a></p>
+<p>依赖环境安装</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm">npm <span class="hljs-keyword">install </span>esprima<br>npm <span class="hljs-keyword">install </span>css-tree<br>npm <span class="hljs-keyword">install </span>cssbeautify<br>npm <span class="hljs-keyword">install </span>vm2<br>npm <span class="hljs-keyword">install </span>uglify-es<br>npm <span class="hljs-keyword">install </span><span class="hljs-keyword">js-beautify</span><br><span class="hljs-keyword">npm </span><span class="hljs-keyword">install </span>cheerio<br></code></pre></td></tr></table></figure>
+<p>获取源码</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs crmsh"><span class="hljs-keyword">node</span> <span class="hljs-title">wuWxapkg</span>.js <span class="hljs-number">123</span>.wxapkg		<span class="hljs-comment">#编译主包</span><br>或者：./bingo.sh <span class="hljs-number">123</span>.wxapkg		<br><br><span class="hljs-keyword">node</span> <span class="hljs-title">wuWxapkg</span>.js 子包.wxapkg -s=/主包生成的文件路径	<span class="hljs-comment">#编译存在主包与子包的情况</span><br>或者：./bingo.sh 子包.wxapkg -s=/主包生成的文件路径<br></code></pre></td></tr></table></figure>
+    
+  </article>
+
+  
+      
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+</div>
+
+  
+      <div class="nexmoe-post-footer">
+          
+      </div>
+  
+</div>
+            <div class="nexmoe-post-right">
+              <div class="nexmoe-fixed">
+                  <div class="nexmoe-tool"> 
+                    
+                      
+                        
+                          
+                          
+                              <button class="mdui-fab catalog" style="overflow:unset;">
+                                  <i class="nexmoefont icon-i-catalog"></i>
+                                  <div class="nexmoe-toc">
+                                      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8A%93%E5%8C%85"><span class="toc-number">1.</span> <span class="toc-text">抓包</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BE%AE%E4%BF%A1User-Agent"><span class="toc-number">1.1.</span> <span class="toc-text">微信User-Agent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mac%E4%B8%8B%E6%8A%93%E5%8F%96%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%8C%85"><span class="toc-number">1.2.</span> <span class="toc-text">mac下抓取微信小程序数据包</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#iphone%E6%89%8B%E6%9C%BA%E6%8A%93%E5%8F%96%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7%E6%95%B0%E6%8D%AE%E5%8C%85"><span class="toc-number">1.3.</span> <span class="toc-text">iphone手机抓取微信公众号数据包</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#yakit%E6%8A%93%E5%8F%96%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7%E5%92%8C%E5%B0%8F%E7%A8%8B%E5%BA%8F"><span class="toc-number">1.4.</span> <span class="toc-text">yakit抓取微信公众号和小程序</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8F%8D%E7%BC%96%E8%AF%91"><span class="toc-number">2.</span> <span class="toc-text">小程序反编译</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E5%B0%8F%E7%A8%8B%E5%BA%8Fwxapkg%E5%8C%85"><span class="toc-number">2.1.</span> <span class="toc-text">获取小程序wxapkg包</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E5%AF%86wxapkg%E5%8C%85"><span class="toc-number">2.2.</span> <span class="toc-text">解密wxapkg包</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#PC%E8%A7%A3%E5%AF%86"><span class="toc-number">2.2.1.</span> <span class="toc-text">PC解密</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E6%8B%9F%E5%99%A8%E4%B8%AD%E6%8A%8Awxapkg%E6%96%87%E4%BB%B6%E5%AF%BC%E5%87%BA"><span class="toc-number">2.3.</span> <span class="toc-text">模拟器中把wxapkg文件导出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8D%E7%BC%96%E8%AF%91%E8%8E%B7%E5%8F%96%E6%BA%90%E7%A0%81%E5%B7%A5%E5%85%B7%EF%BC%88CrackMinApp-zip%EF%BC%89"><span class="toc-number">2.4.</span> <span class="toc-text">反编译获取源码工具（CrackMinApp.zip）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8D%E7%BC%96%E8%AF%91%E8%8E%B7%E5%8F%96%E6%BA%90%E7%A0%81%E5%B7%A5%E5%85%B7%EF%BC%88wxappUnpacker1%EF%BC%89"><span class="toc-number">2.5.</span> <span class="toc-text">反编译获取源码工具（wxappUnpacker1）</span></a></li></ol></li></ol>
+                                  </div>
+                              </button>
+                          
+                          
+                      
+                    
+                      <a href="#nexmoe-content" class="toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+                  </div>
+              </div>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-search-space">
+	<div class="search-container">
+		<div class="search-header">
+			<div class="search-input-container">
+				<input
+					class="search-input"
+					type="text"
+					placeholder="搜索"
+					oninput="sinput();"
+				/>
+			</div>
+			<a class="search-close" onclick="sclose();">×</a>
+		</div>
+		<div class="search-body"></div>
+	</div>
+</div>
+
+    
+<script src="/lib/mdui_043tiny/mdui.js"></script>
+<script src="/lib/fancybox/fancybox.umd.js"></script>
+
+
+ 
+
+<script async src="/js/app.js?v=1665474214410"></script>
+
+
+
+</body>
+
+</html>

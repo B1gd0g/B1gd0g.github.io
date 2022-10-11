@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+    
+    <title>js-接口泄露漏洞挖掘 - B1gd0g</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+    
+    <link rel="shortcut icon" href="https://spring.io/images/favicon-9d25009f65637a49ac8d91eb1cf7b75e.ico" type="image/x-icon" />
+    <meta name="description" content="举个栗子举例：出现在app*****.js中的接口信息泄露">
+<meta property="og:type" content="article">
+<meta property="og:title" content="js-接口泄露漏洞挖掘">
+<meta property="og:url" content="https://b1gd0g.github.io/2021/04/13/Js-%E6%8E%A5%E5%8F%A3%E6%B3%84%E9%9C%B2%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/index.html">
+<meta property="og:site_name" content="B1gd0g">
+<meta property="og:description" content="举个栗子举例：出现在app*****.js中的接口信息泄露">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235541.jpg">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235545.jpg">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235558.jpg">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235606.jpg">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235612.jpg">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235618.jpg">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235622.jpg">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235626.jpg">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235630.jpg">
+<meta property="og:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235633.jpg">
+<meta property="article:published_time" content="2021-04-13T12:46:25.000Z">
+<meta property="article:modified_time" content="2022-10-11T02:37:42.744Z">
+<meta property="article:author" content="B1gd0g">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235541.jpg">
+    
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+    <link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1665474214426">
+    
+    <link rel="stylesheet" href="/css/style.css?v=1665474214426">
+
+    
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="mdui-drawer-body-left">
+    <div id="nexmoe-background">
+        <div class="nexmoe-bg" style="background-image: url(https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111542873.png)"></div>
+        <div class="mdui-appbar mdui-shadow-0">
+            <div class="mdui-toolbar">
+                <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon mdui-ripple"><i class="mdui-icon nexmoefont icon-menu"></i></a>
+                <div class="mdui-toolbar-spacer"></div>
+                <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+                <a href="/" title="B1gd0g" class="mdui-btn mdui-btn-icon"><img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g"></a>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-header">
+        <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="B1gd0g">
+            <img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g" alt="B1gd0g">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>15</div>
+        <div><span>标签</span>12</div>
+        <div><span>分类</span>2</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E6%9D%80%E8%BD%AF%E5%AF%B9%E6%AF%94.html" title="杀软对比">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                杀软对比
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E7%A4%BE%E5%B7%A5%E5%AF%86%E7%A0%81.html" title="社工密码">
+            <i class="mdui-list-item-icon nexmoefont icon-coffee"></i>
+            <div class="mdui-list-item-content">
+                社工密码
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E5%AF%BC%E8%88%AA.html" title="我的导航">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                我的导航
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/about.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    <aside id="nexmoe-sidebar">
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="搜索"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <!-- 一言 -->
+<div class="nexmoe-widget-wrap">
+  <h3 class="nexmoe-widget-title">
+    一言
+  </h3>
+  <div class="nexmoe-widget">
+    <ul class="hitokoto-box">
+      <li id="hitokoto_text_parent" class="hitokoto-text" hitokotoCategory="">
+        <a href="#" id="hitokoto_text">
+          
+        </a>
+        <a href="#" id="hitokoto_error_text" style="display: none;">
+          
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  let hitokotoText = document.getElementById('hitokoto_text')
+  let hitokotoErroText = document.getElementById('hitokoto_error_text')
+  let hitokotoCategory = document.getElementById('hitokoto_text_parent').getAttribute('hitokotoCategory')
+  window.onload = function () {
+    let url = 'https://v1.hitokoto.cn'
+    if (hitokotoCategory) {
+      url += '?c=' + hitokotoCategory
+    }
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        hitokotoText.innerText = "「 " + data.hitokoto + " 」 from " + data.from
+        hitokotoText.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      })
+      .catch((reason) => {
+        console.error(11, reason)
+        hitokotoText.style.display = 'none'
+        hitokotoErroText.style.display = 'block'
+      })
+  }
+</script>
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章分类</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/tools/">tools</a>
+          <span class="category-list-count">4</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/安全小记/">安全小记</a>
+          <span class="category-list-count">10</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/Html/" style="font-size: 10px;">Html</a> <a href="/tags/JavaScript/" style="font-size: 10px;">JavaScript</a> <a href="/tags/PHP/" style="font-size: 10px;">PHP</a> <a href="/tags/cmd/" style="font-size: 10px;">cmd</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" style="font-size: 10px;">代码审计</a> <a href="/tags/%E5%85%8D%E6%9D%80/" style="font-size: 10px;">免杀</a> <a href="/tags/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/" style="font-size: 10px;">内网渗透</a> <a href="/tags/%E6%8F%90%E6%9D%83/" style="font-size: 10px;">提权</a> <a href="/tags/%E7%BA%A2%E8%93%9D%E5%AF%B9%E6%8A%97/" style="font-size: 10px;">红蓝对抗</a> <a href="/tags/%E9%92%93%E9%B1%BC/" style="font-size: 10px;">钓鱼</a>
+    </div>
+    
+  </div>
+
+    
+        
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2022 B1gd0g
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        
+    </div>
+</div><!-- .nexmoe-drawer -->
+    </div>
+    <div id="nexmoe-content">
+        <div class="nexmoe-primary">
+            <div class="nexmoe-post">
+
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 37.5%;"> 
+            <img src="https://ctfiot.oss-cn-beijing.aliyuncs.com/uploads/2022/01/9-1641303460.png" alt="js-接口泄露漏洞挖掘" loading="lazy">
+            <h1>js-接口泄露漏洞挖掘</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2021年04月13日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/tools/">tools</a>
+        
+        
+    <a><i class="nexmoefont icon-areachart"></i>约201字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>预计需要1分钟</a>
+
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <h2 id="举个栗子"><a href="#举个栗子" class="headerlink" title="举个栗子"></a>举个栗子</h2><p>举例：出现在app*****.js中的接口信息泄露</p>
+<a id="more"></a>
+
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235541.jpg" alt="image" data-caption="image" loading="lazy"></p>
+<h2 id="BurpSuite扩展"><a href="#BurpSuite扩展" class="headerlink" title="BurpSuite扩展"></a>BurpSuite扩展</h2><p>1、 Unexpected information</p>
+<p>下载地址：</p>
+<p> <a target="_blank" rel="noopener" href="https://github.com/ScriptKid-Beta/Unexpected_information">https://github.com/ScriptKid-Beta/Unexpected_information</a></p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235545.jpg" alt="image" data-caption="image" loading="lazy"></p>
+<p>2、 HaE扩展</p>
+<p>下载地址： <a target="_blank" rel="noopener" href="https://github.com/gh0stkey/HaE">https://github.com/gh0stkey/HaE</a></p>
+<p>正则地址：<a target="_blank" rel="noopener" href="https://gh0st.cn/HaE/">https://gh0st.cn/HaE/</a></p>
+<h2 id="BurpSuite-Proxy设置"><a href="#BurpSuite-Proxy设置" class="headerlink" title="BurpSuite Proxy设置"></a>BurpSuite Proxy设置</h2><p>安装方法就不啰嗦了……</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235558.jpg" alt="image" data-caption="image" loading="lazy"></p>
+<h2 id="Unexpected-information插件自动提取JS中的接口信息"><a href="#Unexpected-information插件自动提取JS中的接口信息" class="headerlink" title="Unexpected information插件自动提取JS中的接口信息"></a>Unexpected information插件自动提取JS中的接口信息</h2><p>多访问两下js文件，就可以看到，bp的流量记录里存在app***.js的返回信息，然后直接复制Unexpected information扩展自动提取的js接口部分内容</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235606.jpg" alt="image" data-caption="image" loading="lazy"></p>
+<h2 id="使用BurpSuite-Intruder模块进行批量访问"><a href="#使用BurpSuite-Intruder模块进行批量访问" class="headerlink" title="使用BurpSuite Intruder模块进行批量访问"></a>使用BurpSuite Intruder模块进行批量访问</h2><p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235612.jpg" alt="image" data-caption="image" loading="lazy"></p>
+<p>1、 可尝试修改请求方法，如POST方法，请求体仅设置为{}等（未授权）</p>
+<p>2、 可登陆状态下再次尝试批量访问泄露的接口（越权）</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235618.jpg" alt="image" data-caption="image" loading="lazy"></p>
+<p>Payload设置</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235622.jpg" alt="image" data-caption="image" loading="lazy"></p>
+<h2 id="效果如下"><a href="#效果如下" class="headerlink" title="效果如下"></a>效果如下</h2><p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235626.jpg" alt="image" data-caption="image" loading="lazy"></p>
+<p>未授权+越权：</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235630.jpg" alt="image" data-caption="image" loading="lazy"></p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://gitee.com/B1gd0g888/baipiaotuchang/raw/master/20220221235633.jpg" alt="image" data-caption="image" loading="lazy"></p>
+
+    
+  </article>
+
+  
+      
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+</div>
+
+  
+      <div class="nexmoe-post-footer">
+          
+      </div>
+  
+</div>
+            <div class="nexmoe-post-right">
+              <div class="nexmoe-fixed">
+                  <div class="nexmoe-tool"> 
+                    
+                      
+                        
+                          
+                          
+                              <button class="mdui-fab catalog" style="overflow:unset;">
+                                  <i class="nexmoefont icon-i-catalog"></i>
+                                  <div class="nexmoe-toc">
+                                      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BE%E4%B8%AA%E6%A0%97%E5%AD%90"><span class="toc-number">1.</span> <span class="toc-text">举个栗子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#BurpSuite%E6%89%A9%E5%B1%95"><span class="toc-number">2.</span> <span class="toc-text">BurpSuite扩展</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#BurpSuite-Proxy%E8%AE%BE%E7%BD%AE"><span class="toc-number">3.</span> <span class="toc-text">BurpSuite Proxy设置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Unexpected-information%E6%8F%92%E4%BB%B6%E8%87%AA%E5%8A%A8%E6%8F%90%E5%8F%96JS%E4%B8%AD%E7%9A%84%E6%8E%A5%E5%8F%A3%E4%BF%A1%E6%81%AF"><span class="toc-number">4.</span> <span class="toc-text">Unexpected information插件自动提取JS中的接口信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8BurpSuite-Intruder%E6%A8%A1%E5%9D%97%E8%BF%9B%E8%A1%8C%E6%89%B9%E9%87%8F%E8%AE%BF%E9%97%AE"><span class="toc-number">5.</span> <span class="toc-text">使用BurpSuite Intruder模块进行批量访问</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%88%E6%9E%9C%E5%A6%82%E4%B8%8B"><span class="toc-number">6.</span> <span class="toc-text">效果如下</span></a></li></ol>
+                                  </div>
+                              </button>
+                          
+                          
+                      
+                    
+                      <a href="#nexmoe-content" class="toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+                  </div>
+              </div>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-search-space">
+	<div class="search-container">
+		<div class="search-header">
+			<div class="search-input-container">
+				<input
+					class="search-input"
+					type="text"
+					placeholder="搜索"
+					oninput="sinput();"
+				/>
+			</div>
+			<a class="search-close" onclick="sclose();">×</a>
+		</div>
+		<div class="search-body"></div>
+	</div>
+</div>
+
+    
+<script src="/lib/mdui_043tiny/mdui.js"></script>
+<script src="/lib/fancybox/fancybox.umd.js"></script>
+
+
+ 
+
+<script async src="/js/app.js?v=1665474214427"></script>
+
+
+
+</body>
+
+</html>

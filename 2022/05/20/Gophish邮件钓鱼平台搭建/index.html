@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+    
+    <title>Gophish邮件钓鱼平台搭建 - B1gd0g</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+    
+    <link rel="shortcut icon" href="https://spring.io/images/favicon-9d25009f65637a49ac8d91eb1cf7b75e.ico" type="image/x-icon" />
+    <meta name="description" content="网络钓鱼框架 邮件钓鱼 gophish 通过虚假邮件让访问者中招,获取账号密码 利用伪装的电子邮件，欺骗收件人将账号、口令等信息回复给指定的接收者；或引导收件人连接到特制的网页，这些网页通常会伪装成和真实网站一样，如银行或理财的网页，令登录者信以为真，输入信用卡或银行卡号码、账户名称及密码等而被盗。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gophish邮件钓鱼平台搭建">
+<meta property="og:url" content="https://b1gd0g.github.io/2022/05/20/Gophish%E9%82%AE%E4%BB%B6%E9%92%93%E9%B1%BC%E5%B9%B3%E5%8F%B0%E6%90%AD%E5%BB%BA/index.html">
+<meta property="og:site_name" content="B1gd0g">
+<meta property="og:description" content="网络钓鱼框架 邮件钓鱼 gophish 通过虚假邮件让访问者中招,获取账号密码 利用伪装的电子邮件，欺骗收件人将账号、口令等信息回复给指定的接收者；或引导收件人连接到特制的网页，这些网页通常会伪装成和真实网站一样，如银行或理财的网页，令登录者信以为真，输入信用卡或银行卡号码、账户名称及密码等而被盗。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201422391.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419950.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419025.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201422842.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419222.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419304.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201423631.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201423061.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419489.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419555.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419876.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419722.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419738.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201423852.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419194.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419449.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419210.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419464.png">
+<meta property="article:published_time" content="2022-05-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-10-11T02:37:37.019Z">
+<meta property="article:author" content="B1gd0g">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201422391.png">
+    
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+    <link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1665474214410">
+    
+    <link rel="stylesheet" href="/css/style.css?v=1665474214410">
+
+    
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="mdui-drawer-body-left">
+    <div id="nexmoe-background">
+        <div class="nexmoe-bg" style="background-image: url(https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111542873.png)"></div>
+        <div class="mdui-appbar mdui-shadow-0">
+            <div class="mdui-toolbar">
+                <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon mdui-ripple"><i class="mdui-icon nexmoefont icon-menu"></i></a>
+                <div class="mdui-toolbar-spacer"></div>
+                <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+                <a href="/" title="B1gd0g" class="mdui-btn mdui-btn-icon"><img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g"></a>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-header">
+        <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="B1gd0g">
+            <img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g" alt="B1gd0g">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>15</div>
+        <div><span>标签</span>12</div>
+        <div><span>分类</span>2</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E6%9D%80%E8%BD%AF%E5%AF%B9%E6%AF%94.html" title="杀软对比">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                杀软对比
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E7%A4%BE%E5%B7%A5%E5%AF%86%E7%A0%81.html" title="社工密码">
+            <i class="mdui-list-item-icon nexmoefont icon-coffee"></i>
+            <div class="mdui-list-item-content">
+                社工密码
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E5%AF%BC%E8%88%AA.html" title="我的导航">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                我的导航
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/about.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    <aside id="nexmoe-sidebar">
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="搜索"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <!-- 一言 -->
+<div class="nexmoe-widget-wrap">
+  <h3 class="nexmoe-widget-title">
+    一言
+  </h3>
+  <div class="nexmoe-widget">
+    <ul class="hitokoto-box">
+      <li id="hitokoto_text_parent" class="hitokoto-text" hitokotoCategory="">
+        <a href="#" id="hitokoto_text">
+          
+        </a>
+        <a href="#" id="hitokoto_error_text" style="display: none;">
+          
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  let hitokotoText = document.getElementById('hitokoto_text')
+  let hitokotoErroText = document.getElementById('hitokoto_error_text')
+  let hitokotoCategory = document.getElementById('hitokoto_text_parent').getAttribute('hitokotoCategory')
+  window.onload = function () {
+    let url = 'https://v1.hitokoto.cn'
+    if (hitokotoCategory) {
+      url += '?c=' + hitokotoCategory
+    }
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        hitokotoText.innerText = "「 " + data.hitokoto + " 」 from " + data.from
+        hitokotoText.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      })
+      .catch((reason) => {
+        console.error(11, reason)
+        hitokotoText.style.display = 'none'
+        hitokotoErroText.style.display = 'block'
+      })
+  }
+</script>
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章分类</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/tools/">tools</a>
+          <span class="category-list-count">4</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/安全小记/">安全小记</a>
+          <span class="category-list-count">10</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/Html/" style="font-size: 10px;">Html</a> <a href="/tags/JavaScript/" style="font-size: 10px;">JavaScript</a> <a href="/tags/PHP/" style="font-size: 10px;">PHP</a> <a href="/tags/cmd/" style="font-size: 10px;">cmd</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" style="font-size: 10px;">代码审计</a> <a href="/tags/%E5%85%8D%E6%9D%80/" style="font-size: 10px;">免杀</a> <a href="/tags/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/" style="font-size: 10px;">内网渗透</a> <a href="/tags/%E6%8F%90%E6%9D%83/" style="font-size: 10px;">提权</a> <a href="/tags/%E7%BA%A2%E8%93%9D%E5%AF%B9%E6%8A%97/" style="font-size: 10px;">红蓝对抗</a> <a href="/tags/%E9%92%93%E9%B1%BC/" style="font-size: 10px;">钓鱼</a>
+    </div>
+    
+  </div>
+
+    
+        
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2022 B1gd0g
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        
+    </div>
+</div><!-- .nexmoe-drawer -->
+    </div>
+    <div id="nexmoe-content">
+        <div class="nexmoe-primary">
+            <div class="nexmoe-post">
+
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 37.5%;"> 
+            <img src="https://ns-strategy.cdn.bcebos.com/ns-strategy/upload/fc_big_pic/part-00598-1027.jpg" alt="Gophish邮件钓鱼平台搭建" loading="lazy">
+            <h1>Gophish邮件钓鱼平台搭建</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2022年05月20日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/%E5%AE%89%E5%85%A8%E5%B0%8F%E8%AE%B0/">安全小记</a>
+        
+        
+    <a><i class="nexmoefont icon-areachart"></i>约1.1k字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>预计需要3分钟</a>
+
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <p>网络钓鱼框架 邮件钓鱼 gophish 通过虚假邮件让访问者中招,获取账号密码 利用伪装的电子邮件，欺骗收件人将账号、口令等信息回复给指定的接收者；或引导收件人连接到特制的网页，这些网页通常会伪装成和真实网站一样，如银行或理财的网页，令登录者信以为真，输入信用卡或银行卡号码、账户名称及密码等而被盗。</p>
+<a id="more"></a>
+
+<hr>
+<h2 id="0x1-平台搭建"><a href="#0x1-平台搭建" class="headerlink" title="0x1 平台搭建"></a>0x1 平台搭建</h2><h3 id="1、下载安装"><a href="#1、下载安装" class="headerlink" title="1、下载安装"></a>1、下载安装</h3><p><a target="_blank" rel="noopener" href="https://github.com/gophish%EF%BC%88%E8%BF%99%E9%87%8C%E6%90%AD%E5%BB%BA%E7%9B%B4%E6%8E%A5%E7%94%A8%E7%9A%84%E6%98%AFubantu%E6%9C%8D%E5%8A%A1%E5%99%A8%EF%BC%89">https://github.com/gophish（这里搭建直接用的是ubantu服务器）</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget https://github.com/gophish/gophish/releases/download/v0.11.0/gophish-v0.11.0-linux-64bit.zip<br><br>unzip gophish-v0.11.0-linux-64bit.zip<br></code></pre></td></tr></table></figure>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201422391.png" alt="img" data-caption="img" loading="lazy"></p>
+<h3 id="2、修改-config-json"><a href="#2、修改-config-json" class="headerlink" title="2、修改 config.json"></a>2、修改 config.json</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim config.json<br></code></pre></td></tr></table></figure>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419950.png" alt="img" data-caption="img" loading="lazy"></p>
+<ul>
+<li>admin_server 把 127.0.0.1 改为 0.0.0.0，外网直接访问就要0.0.0.0</li>
+<li>listen_url也要是0.0.0.0:81，我的80端口被占用了，所以改81（改成未被使用的端口）</li>
+</ul>
+<h3 id="3、搭建运行"><a href="#3、搭建运行" class="headerlink" title="3、搭建运行"></a>3、搭建运行</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">chmod +x gophish<br>./gophish		<span class="hljs-comment">#启动的话我们最好起一个screen让它在后台一直运行</span><br></code></pre></td></tr></table></figure>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419025.png" alt="img" data-caption="img" loading="lazy"></p>
+<p>安装成功后会显示初始admin的密码（后续首次登陆会要求修改密码）</p>
+<p>搭建完成后访问<a target="_blank" rel="noopener" href="https://vps-ip:3333/">https://VPS-IP:3333</a>代表成功</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201422842.png" alt="img" data-caption="img" loading="lazy"></p>
+<h2 id="0x2-配置域名"><a href="#0x2-配置域名" class="headerlink" title="0x2 配置域名"></a>0x2 配置域名</h2><p>个人建议使用国外的域名和云vps，尽量弄一个近似域名（提高可信度，成功率更高些）</p>
+<p>设置域名的DNS管理页面增加两条记录:</p>
+<p>我这里是白嫖的freenom的域名+cloudflare配合解析（至于怎么白嫖域名搜索琢磨一下）</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419222.png" alt="img" data-caption="img" loading="lazy"></p>
+<h3 id="1、freenom配置"><a href="#1、freenom配置" class="headerlink" title="1、freenom配置"></a>1、freenom配置</h3><p>把freenom注册的域名添加到cloudflare，需要把cloudflare上的这两条域名值设置到freenom配置里面即可</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419304.png" alt="img" data-caption="img" loading="lazy"></p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201423631.png" alt="img" data-caption="img" loading="lazy"></p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201423061.png" alt="img" data-caption="img" loading="lazy"></p>
+<h2 id="0x3-邮服搭建"><a href="#0x3-邮服搭建" class="headerlink" title="0x3 邮服搭建"></a>0x3 邮服搭建</h2><ul>
+<li>由于我的VPS一直是Ubuntu，所以选择使用 Postfix+mailutils</li>
+</ul>
+<h3 id="1、安装Postfix"><a href="#1、安装Postfix" class="headerlink" title="1、安装Postfix"></a>1、安装Postfix</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">apt install postfix -y<br></code></pre></td></tr></table></figure>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419489.png" alt="img" data-caption="img" loading="lazy"></p>
+<p>此处填入自己白嫖的域名</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419555.png" alt="img" data-caption="img" loading="lazy"></p>
+<h3 id="2、安装mailx软件包"><a href="#2、安装mailx软件包" class="headerlink" title="2、安装mailx软件包"></a>2、安装mailx软件包</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">apt install mailutils -y<br></code></pre></td></tr></table></figure>
+<p>至此邮件服务器搭建完成</p>
+<h3 id="3、邮件发送测试"><a href="#3、邮件发送测试" class="headerlink" title="3、邮件发送测试"></a>3、邮件发送测试</h3><p>直接登陆<a href="https://VPS-IP:3333进行邮件服务器配置">https://VPS-IP:3333进行邮件服务器配置</a></p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419876.png" alt="img" data-caption="img" loading="lazy"></p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419722.png" alt="img" data-caption="img" loading="lazy"></p>
+<p>配置成我们刚刚配置好的域名（此处邮箱用户名liwei可随意，此用户名就是后面邮件发送的所用的用户名）</p>
+<p>我们先进行测试一下看看能否正常发送邮件，利用qq邮箱测试一下</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419738.png" alt="img" data-caption="img" loading="lazy"></p>
+<p>qq邮箱成功收到邮件</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201423852.png" alt="img" data-caption="img" loading="lazy"></p>
+<h2 id="0x4-甩杆钓鱼"><a href="#0x4-甩杆钓鱼" class="headerlink" title="0x4 甩杆钓鱼"></a>0x4 甩杆钓鱼</h2><p>添加钓鱼邮件模版，模版自行设计，尽量看起来真实可信，模版也可直接导入</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419194.png" alt="img" data-caption="img" loading="lazy"></p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419449.png" alt="img" data-caption="img" loading="lazy"></p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419210.png" alt="img" data-caption="img" loading="lazy"></p>
+<h3 id="1、鱼饵制作"><a href="#1、鱼饵制作" class="headerlink" title="1、鱼饵制作"></a>1、鱼饵制作</h3><p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202205201419464.png" alt="img" data-caption="img" loading="lazy"></p>
+<h4 id="001-域名伪装"><a href="#001-域名伪装" class="headerlink" title="001 域名伪装"></a>001 域名伪装</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">&lt;a href=<span class="hljs-string">&quot;http://www.eval.me&quot;</span>&gt;www.aliyun.com&lt;/a&gt;  <span class="hljs-comment">#超链接,把元素内容改成想要仿冒的域名，在邮箱页面上，就会直接显示元素的内容</span><br></code></pre></td></tr></table></figure>
+<h4 id="002-饵料参考"><a href="#002-饵料参考" class="headerlink" title="002 饵料参考"></a>002 饵料参考</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash">近期由于我们公司的邮箱密码泄露，为防止不法分子利用，影响到我们的数据安全，各位员工的密码均需要及时更新修改，在收到邮件的第一时间，请登录如下平台，立即修改自己邮箱的账号密码。<br><br>上网行为管理发现您的账号今日存在异常行为，为了防止您的账号被不法分子盗取，我们暂时将您的账号进行了冻结，如果不是您本人的操作的话，通过以下链接进行解冻。<br><br>近日微软发布了本月安全更新补丁，其中包含一个RDP（远程桌面服务）远程代码执行漏洞的补丁更新，对应CVE编号为CVE-2019-0708,现需要所有员工的电脑都打上补丁，漏洞补丁直接下载附件即可<br><br>以相关部门名义发布整改通告<br></code></pre></td></tr></table></figure>
+<h4 id="003-搭配诱饵"><a href="#003-搭配诱饵" class="headerlink" title="003 搭配诱饵"></a>003 搭配诱饵</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">克隆页面获取账号密码<br>Lnk（快捷方式)<br>文件后缀RTLO（后缀名反转）<br>CHM文档<br>自解压<br>office宏<br>exe超长文件名<br>html后缀文件<br></code></pre></td></tr></table></figure>
+<h3 id="2、目标邮箱获取姿势"><a href="#2、目标邮箱获取姿势" class="headerlink" title="2、目标邮箱获取姿势"></a>2、目标邮箱获取姿势</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">https://github.com/laramies/theHarvester<br>https://github.com/bit4woo/teemo<br>https://www.email-format.com/i/search/<br>https://hunter.io/<br>http://www.skymem.info/<br>参考：红队测试之邮箱打点https://mp.weixin.qq.com/s/aatNjey3swZz7T4Yw_LqsQ<br></code></pre></td></tr></table></figure>
+<hr>
+<p>说到底钓鱼最主要的还是话术与免杀。</p>
+
+    
+  </article>
+
+  
+      
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+</div>
+
+  
+      <div class="nexmoe-post-footer">
+          
+      </div>
+  
+</div>
+            <div class="nexmoe-post-right">
+              <div class="nexmoe-fixed">
+                  <div class="nexmoe-tool"> 
+                    
+                      
+                        
+                          
+                          
+                              <button class="mdui-fab catalog" style="overflow:unset;">
+                                  <i class="nexmoefont icon-i-catalog"></i>
+                                  <div class="nexmoe-toc">
+                                      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#0x1-%E5%B9%B3%E5%8F%B0%E6%90%AD%E5%BB%BA"><span class="toc-number">1.</span> <span class="toc-text">0x1 平台搭建</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E4%B8%8B%E8%BD%BD%E5%AE%89%E8%A3%85"><span class="toc-number">1.1.</span> <span class="toc-text">1、下载安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81%E4%BF%AE%E6%94%B9-config-json"><span class="toc-number">1.2.</span> <span class="toc-text">2、修改 config.json</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81%E6%90%AD%E5%BB%BA%E8%BF%90%E8%A1%8C"><span class="toc-number">1.3.</span> <span class="toc-text">3、搭建运行</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x2-%E9%85%8D%E7%BD%AE%E5%9F%9F%E5%90%8D"><span class="toc-number">2.</span> <span class="toc-text">0x2 配置域名</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81freenom%E9%85%8D%E7%BD%AE"><span class="toc-number">2.1.</span> <span class="toc-text">1、freenom配置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x3-%E9%82%AE%E6%9C%8D%E6%90%AD%E5%BB%BA"><span class="toc-number">3.</span> <span class="toc-text">0x3 邮服搭建</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E5%AE%89%E8%A3%85Postfix"><span class="toc-number">3.1.</span> <span class="toc-text">1、安装Postfix</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81%E5%AE%89%E8%A3%85mailx%E8%BD%AF%E4%BB%B6%E5%8C%85"><span class="toc-number">3.2.</span> <span class="toc-text">2、安装mailx软件包</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81%E9%82%AE%E4%BB%B6%E5%8F%91%E9%80%81%E6%B5%8B%E8%AF%95"><span class="toc-number">3.3.</span> <span class="toc-text">3、邮件发送测试</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x4-%E7%94%A9%E6%9D%86%E9%92%93%E9%B1%BC"><span class="toc-number">4.</span> <span class="toc-text">0x4 甩杆钓鱼</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E9%B1%BC%E9%A5%B5%E5%88%B6%E4%BD%9C"><span class="toc-number">4.1.</span> <span class="toc-text">1、鱼饵制作</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#001-%E5%9F%9F%E5%90%8D%E4%BC%AA%E8%A3%85"><span class="toc-number">4.1.1.</span> <span class="toc-text">001 域名伪装</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#002-%E9%A5%B5%E6%96%99%E5%8F%82%E8%80%83"><span class="toc-number">4.1.2.</span> <span class="toc-text">002 饵料参考</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#003-%E6%90%AD%E9%85%8D%E8%AF%B1%E9%A5%B5"><span class="toc-number">4.1.3.</span> <span class="toc-text">003 搭配诱饵</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81%E7%9B%AE%E6%A0%87%E9%82%AE%E7%AE%B1%E8%8E%B7%E5%8F%96%E5%A7%BF%E5%8A%BF"><span class="toc-number">4.2.</span> <span class="toc-text">2、目标邮箱获取姿势</span></a></li></ol></li></ol>
+                                  </div>
+                              </button>
+                          
+                          
+                      
+                    
+                      <a href="#nexmoe-content" class="toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+                  </div>
+              </div>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-search-space">
+	<div class="search-container">
+		<div class="search-header">
+			<div class="search-input-container">
+				<input
+					class="search-input"
+					type="text"
+					placeholder="搜索"
+					oninput="sinput();"
+				/>
+			</div>
+			<a class="search-close" onclick="sclose();">×</a>
+		</div>
+		<div class="search-body"></div>
+	</div>
+</div>
+
+    
+<script src="/lib/mdui_043tiny/mdui.js"></script>
+<script src="/lib/fancybox/fancybox.umd.js"></script>
+
+
+ 
+
+<script async src="/js/app.js?v=1665474214413"></script>
+
+
+
+</body>
+
+</html>

